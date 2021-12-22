@@ -49,6 +49,9 @@ class Game:
         self.screen_dimensions = (self.screen_width, self.screen_height)
         self.render_dimensions = (self.render_width, self.render_height)
 
+        self.items = []
+        self.particles = []
+
         # objects
         screen_flags = pygame.DOUBLEBUF, pygame.HWSURFACE
         self.screen = pygame.display.set_mode(self.screen_dimensions, *screen_flags)
@@ -60,6 +63,8 @@ class Game:
         self.render_surface.set_colorkey(colors.black)
         self.rock_handler = rock_handler.RockHandler()
         self.player = player.Player((100, 100), landed_rocks=self.rock_handler.landed_rocks, falling_rocks=self.rock_handler.falling_rocks, chests=self.rock_handler.chests)
+
+        self.chests = self.rock_handler.chests
 
         # images
         self.background_rect_image = pygame.image.load("Data/Assets/Sprites/Background/rect.png").convert_alpha()
@@ -128,6 +133,8 @@ class Game:
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     self.player.jump()
+                elif event.key == pygame.K_s:
+                    self.player.smash_down()
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_a]:
@@ -138,9 +145,26 @@ class Game:
             self.player.stop()
 
     def update_chests(self, surface):
+        to_remove = []
         # handle chests
-        for entity in self.rock_handler.chests:
-            entity.update(surface, self.rock_handler.falling_rocks)
+        for entity in self.chests:
+            if not entity.done:
+                entity.update(surface, self.rock_handler.falling_rocks)
+
+                if entity.opened and len(entity.items) > 0:
+                    self.items += entity.items
+                    entity.items.clear()
+
+                if entity.opened and len(entity.particles) > 0:
+                    self.particles += entity.particles
+                    entity.particles.clear()
+
+            else:
+                to_remove.append(entity)
+
+        # remove done chests
+        for entity in to_remove:
+            self.chests.remove(entity)
 
     def draw_background(self, surface):
         # base color

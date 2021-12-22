@@ -35,8 +35,8 @@ class Chest:
             if len(self.particles) <= 0:
                 self.done = True
 
-        for entity in self.particles:
-            entity.update()
+        if self.rect.y >= 288:
+            self.done = True
 
     def open(self):
         self.opened = True
