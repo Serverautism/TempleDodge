@@ -61,7 +61,7 @@ class RockHandler:
             self.falling_rocks.append(new_rock)
             # spawn chest
             if random.randint(1, 10) == 1:
-                self.chests.append(chest.Chest(new_rock, random.choice(['gold', 'mana'])))
+                self.chests.append(chest.Chest(new_rock, random.choice(['gold', 'mana']), self.landed_rocks, self.falling_rocks))
 
         # handle landed rocks
         to_remove = []

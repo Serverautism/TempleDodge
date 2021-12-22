@@ -1,12 +1,18 @@
 import pygame
+from random import randint
+
+
+from . import item
 
 
 class Chest:
-    def __init__(self, rock, item):
+    def __init__(self, rock, name, landed_rocks, falling_rocks):
         self.rock = rock
-        self.item = item
-        self.closed_image = pygame.image.load(f'Data/Assets/Sprites/Chest/chest_{self.item}_1.png').convert_alpha()
-        self.open_image = pygame.image.load(f'Data/Assets/sprites/Chest/chest_{self.item}_2.png').convert_alpha()
+        self.name = name
+        self.landed_rocks = landed_rocks
+        self.falling_rocks = falling_rocks
+        self.closed_image = pygame.image.load(f'Data/Assets/Sprites/Chest/chest_{self.name}_1.png').convert_alpha()
+        self.open_image = pygame.image.load(f'Data/Assets/sprites/Chest/chest_{self.name}_2.png').convert_alpha()
         self.rect = self.closed_image.get_rect()
         self.rect.bottom = self.rock.rect.top
         self.rect.x = self.rock.rect.x
@@ -15,8 +21,11 @@ class Chest:
         self.done = False
         self.particles = []
         self.items = []
-        self.mana_drop_count = 1
-        self.gold_drop_count = 5
+        
+        if self.name == 'gold':
+            self.drop_count = 5
+        elif self.name == 'mana':
+            self.drop_count = 1
 
     def update(self, surface,  all_rocks):
         if not self.crushed:
@@ -39,7 +48,12 @@ class Chest:
             self.done = True
 
     def open(self):
-        self.opened = True
+        if not self.opened:
+            self.opened = True
+
+            for i in range(self.drop_count):
+                velocity = [randint(0, 40)/10 - 2, -1]
+                self.items.append(item.Item(self.name, self.rect.center, velocity, self.landed_rocks, self.falling_rocks))
 
     def crush(self):
         self.crushed = True

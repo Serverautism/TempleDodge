@@ -115,6 +115,7 @@ class Game:
             self.rock_handler.update(True, .1, self.render_surface)
             self.update_chests(self.render_surface)
             self.player.update(self.render_surface)
+            self.update_items(self.render_surface)
 
 
             # map shadows
@@ -165,6 +166,18 @@ class Game:
         # remove done chests
         for entity in to_remove:
             self.chests.remove(entity)
+
+    def update_items(self, surface):
+        to_remove = []
+        # handle items
+        for entity in self.items:
+            if entity.collected:
+                to_remove.append(entity)
+            else:
+                entity.update(surface)
+
+        for entity in to_remove:
+            self.items.remove(entity)
 
     def draw_background(self, surface):
         # base color
