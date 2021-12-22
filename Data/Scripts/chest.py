@@ -15,6 +15,8 @@ class Chest:
         self.done = False
         self.particles = []
         self.items = []
+        self.mana_drop_count = 1
+        self.gold_drop_count = 5
 
     def update(self, surface,  all_rocks):
         if not self.crushed:
@@ -38,7 +40,6 @@ class Chest:
 
     def open(self):
         self.opened = True
-        self.rect = self.open_image.get_rect()
 
     def crush(self):
         self.crushed = True

@@ -38,6 +38,7 @@ class RockHandler:
         self.landed_rocks = []
 
         self.chests = []
+        self.items = []
 
         self.map_of_landed_rocks = self.landed_map_default
         self.row_counter = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]

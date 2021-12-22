@@ -52,6 +52,8 @@ class Game:
         # objects
         screen_flags = pygame.DOUBLEBUF, pygame.HWSURFACE
         self.screen = pygame.display.set_mode(self.screen_dimensions, *screen_flags)
+        pygame.display.set_caption('TempleDodge')
+        pygame.display.set_icon(pygame.image.load('Data/Assets/Sprites/Gui/icon.png'))
         self.screen.set_colorkey(colors.black)
         self.clock = pygame.time.Clock()
         self.render_surface = pygame.Surface(self.render_dimensions).convert_alpha()
