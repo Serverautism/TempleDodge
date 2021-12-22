@@ -59,7 +59,7 @@ class Game:
         self.render_surface = pygame.Surface(self.render_dimensions).convert_alpha()
         self.render_surface.set_colorkey(colors.black)
         self.rock_handler = rock_handler.RockHandler()
-        self.player = player.Player((100, 100), landed_rocks=self.rock_handler.landed_rocks, falling_rocks=self.rock_handler.falling_rocks)
+        self.player = player.Player((100, 100), landed_rocks=self.rock_handler.landed_rocks, falling_rocks=self.rock_handler.falling_rocks, chests=self.rock_handler.chests)
 
         # images
         self.background_rect_image = pygame.image.load("Data/Assets/Sprites/Background/rect.png").convert_alpha()

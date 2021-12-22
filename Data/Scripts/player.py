@@ -77,7 +77,7 @@ class Player:
         self.check_collision_y()
 
         # check chests and items
-        self.check_chests(self)
+        self.check_chests()
 
         # get image and draw
         self.get_image()
@@ -136,6 +136,11 @@ class Player:
                     self.state = 'run'
                 else:
                     self.state = 'idle'
+
+    def check_chests(self):
+        for chest in self.chests:
+            if self.rect.colliderect(chest.rect):
+                chest.open()
 
     def go_left(self):
         self.dx = -self.speed
