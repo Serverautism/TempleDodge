@@ -21,7 +21,7 @@ class MapBorder:
 
 
 class Player:
-    def __init__(self, render_pos, landed_rocks=[], falling_rocks=[], chests=[], items=[], bullets=[]):
+    def __init__(self, render_pos, landed_rocks=None, falling_rocks=None, chests=None, items=None, bullets=None):
         self.pos = render_pos
         self.x, self.y = render_pos
         self.direction = 'R'
@@ -66,6 +66,9 @@ class Player:
         self.items = items
         self.bullets = bullets
 
+        self.gold_count = 0
+        self.mana_count = 0
+
     def update(self, surface):
         # move x, check collision
         self.rect.x += self.dx
@@ -78,6 +81,7 @@ class Player:
 
         # check chests and items
         self.check_chests()
+        self.check_items()
 
         # get image and draw
         self.get_image()
@@ -141,6 +145,16 @@ class Player:
         for chest in self.chests:
             if self.rect.colliderect(chest.rect):
                 chest.open()
+
+    def check_items(self):
+        item_hit_list = pygame.sprite.spritecollide(self, self.items, False, pygame.sprite.collide_mask)
+        for entity in item_hit_list:
+            entity.collect()
+            if entity.name == 'gold':
+                self.gold_count += 1
+            elif entity.name == 'mana':
+                self.mana_count += 1
+        print(self.gold_count, self.mana_count)
 
     def go_left(self):
         self.dx = -self.speed

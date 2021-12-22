@@ -15,6 +15,9 @@ class Item:
         self.frame = randint(0, 5)
         self.collected = False
 
+        self.left_border_rect = pygame.rect.Rect(0, 0, 16, 288)
+        self.right_border_rect = pygame.rect.Rect(512 - 16, 0, 16, 288)
+
         if self.name == 'mana':
             self.frames_len = 15
             path = 'Data/Assets/Sprites/Items/Mana/mana_'
@@ -50,11 +53,28 @@ class Item:
 
     def check_collision_x(self):
         landed_rock_hit_list = pygame.sprite.spritecollide(self, self.landed_rocks, False)
-        for entity in landed_rock_hit_list:
+        if len(landed_rock_hit_list) > 0:
+            for entity in landed_rock_hit_list:
+                if self.velocity[0] > 0:
+                    self.rect.right = entity.rect.left
+                elif self.velocity[0] < 0:
+                    self.rect.left = entity.rect.right
+            self.velocity[0] *= -.75
+
+        falling_rock_hit_list = pygame.sprite.spritecollide(self, self.falling_rocks, False)
+        if len(falling_rock_hit_list) > 0:
             if self.velocity[0] > 0:
-                self.rect.right = entity.rect.left
+                self.rect.x -= self.velocity[0]
             elif self.velocity[0] < 0:
-                self.rect.left = entity.rect.right
+                self.rect.x -= self.velocity[0]
+            self.velocity[0] *= -.75
+
+        if self.rect.colliderect(self.left_border_rect):
+            self.rect.left = self.left_border_rect.right
+            self.velocity[0] *= -.75
+
+        if self.rect.colliderect(self.right_border_rect):
+            self.rect.right = self.right_border_rect.left
             self.velocity[0] *= -.75
 
     def check_collision_y(self):
@@ -68,8 +88,8 @@ class Item:
             self.velocity[1] *= -.25
 
         falling_rock_hit_list = pygame.sprite.spritecollide(self, self.falling_rocks, False)
-        if len(falling_rock_hit_list) > 0:
-            if self.velocity[1] <= 0:
+        for entity in falling_rock_hit_list:
+            if self.rect.y >= entity.rect.y:
                 self.collected = True
             else:
                 self.rect.y -= self.velocity[1]

@@ -62,7 +62,7 @@ class Game:
         self.render_surface = pygame.Surface(self.render_dimensions).convert_alpha()
         self.render_surface.set_colorkey(colors.black)
         self.rock_handler = rock_handler.RockHandler()
-        self.player = player.Player((100, 100), landed_rocks=self.rock_handler.landed_rocks, falling_rocks=self.rock_handler.falling_rocks, chests=self.rock_handler.chests)
+        self.player = player.Player((100, 100), landed_rocks=self.rock_handler.landed_rocks, falling_rocks=self.rock_handler.falling_rocks, chests=self.rock_handler.chests, items=self.items)
 
         self.chests = self.rock_handler.chests
 

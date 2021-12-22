@@ -53,7 +53,7 @@ class Chest:
 
             for i in range(self.drop_count):
                 velocity = [randint(0, 40)/10 - 2, -1]
-                self.items.append(item.Item(self.name, self.rect.center, velocity, self.landed_rocks, self.falling_rocks))
+                self.items.append(item.Item(self.name, [self.rect.center[0], self.rect.top], velocity, self.landed_rocks, self.falling_rocks))
 
     def crush(self):
         self.crushed = True
