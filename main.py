@@ -1,7 +1,7 @@
 import pygame
 import random
 
-from Data.Scripts import colors, rock_handler, player
+from Data.Scripts import colors, rock_handler, player, hud
 
 
 class Game:
@@ -63,7 +63,9 @@ class Game:
         self.render_surface.set_colorkey(colors.black)
         self.rock_handler = rock_handler.RockHandler()
         self.player = player.Player((100, 100), landed_rocks=self.rock_handler.landed_rocks, falling_rocks=self.rock_handler.falling_rocks, chests=self.rock_handler.chests, items=self.items)
+        self.hud = hud.Hud(self.player)
 
+        # more lists
         self.chests = self.rock_handler.chests
 
         # images
@@ -116,7 +118,7 @@ class Game:
             self.update_chests(self.render_surface)
             self.player.update(self.render_surface)
             self.update_items(self.render_surface)
-
+            self.hud.update(self.render_surface)
 
             # map shadows
             self.draw_map_shadows(self.render_surface)

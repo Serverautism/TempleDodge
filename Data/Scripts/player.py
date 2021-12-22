@@ -26,7 +26,7 @@ class Player:
         self.x, self.y = render_pos
         self.direction = 'R'
         self.state = 'idle'
-        self.max_jumps = 2
+        self.max_jumps = 5
         self.jump_count = self.max_jumps
         self.speed = 1
         self.jump_vel = 5
@@ -68,6 +68,7 @@ class Player:
 
         self.gold_count = 0
         self.mana_count = 0
+        self.max_mana = 7
 
     def update(self, surface):
         # move x, check collision
@@ -153,8 +154,8 @@ class Player:
             if entity.name == 'gold':
                 self.gold_count += 1
             elif entity.name == 'mana':
-                self.mana_count += 1
-        print(self.gold_count, self.mana_count)
+                if self.mana_count < self.max_mana:
+                    self.mana_count += 1
 
     def go_left(self):
         self.dx = -self.speed
