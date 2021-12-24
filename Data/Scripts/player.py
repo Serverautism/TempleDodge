@@ -150,7 +150,8 @@ class Player:
                 if not self.godmode:
                     self.hit()
                 else:
-                    print('dead')
+                    # print('dead')
+                    pass
             else:
                 self.rect.bottom = entity.rect.top
                 self.dy = 0

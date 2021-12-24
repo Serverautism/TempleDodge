@@ -1,7 +1,7 @@
 import pygame
 import random
 
-from Data.Scripts import colors, rock_handler, player, hud
+from Data.Scripts import colors, rock_handler, bullet_handler, player, hud
 
 
 class Game:
@@ -63,7 +63,8 @@ class Game:
         self.render_surface = pygame.Surface(self.render_dimensions).convert_alpha()
         self.render_surface.set_colorkey(colors.black)
         self.rock_handler = rock_handler.RockHandler()
-        self.player = player.Player((100, 100), landed_rocks=self.rock_handler.landed_rocks, falling_rocks=self.rock_handler.falling_rocks, chests=self.rock_handler.chests, items=self.items)
+        self.bullet_handler = bullet_handler.BulletHandler(1, 5, 20, 10)
+        self.player = player.Player((100, 100), landed_rocks=self.rock_handler.landed_rocks, falling_rocks=self.rock_handler.falling_rocks, chests=self.rock_handler.chests, items=self.items, bullets=self.bullet_handler.bullets)
         self.hud = hud.Hud(self.player)
 
         # more lists
@@ -119,6 +120,7 @@ class Game:
             self.update_chests(self.render_surface)
             self.player.update(self.render_surface)
             self.update_items(self.render_surface)
+            self.bullet_handler.update(self.render_surface)
             self.hud.update(self.render_surface)
 
             # map shadows

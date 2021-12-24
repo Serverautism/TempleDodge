@@ -4,6 +4,7 @@ import pygame
 class Bullet:
     def __init__(self, velocity, position):
         self.velocity = velocity
+        self.position = position
         self.image = pygame.image.load('Data/Assets/Sprites/Bullets/bullet.png').convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.center = position
@@ -15,25 +16,26 @@ class Bullet:
         self.small_glow_size = self.rect.width * 1.5
 
         self.glow_grow = True
-        self.dead = True
+        self.dead = False
 
         self.sparkle_frames = []
         for i in range(self.sparkle_frames_length):
-            image = pygame.image.load(f'Data/Assets/Sprites/Bullets/sparkle_{i + 1}.png').convert_alpha()
+            image = pygame.image.load(f'Data/Assets/Sprites/Bullets/Sparkle/sparkle_{i + 1}.png').convert_alpha()
             self.sparkle_frames.append(image)
 
     def update(self, surface):
-        self.rect.x += self.velocity[0]
-        self.rect.y += self.velocity[1]
+        self.position[0] += self.velocity[0]
+        self.position[1] += self.velocity[1]
+        self.rect.center = self.position
 
         self.check_dead()
         if not self.dead:
 
             glow_big, glow_small = self.get_glow()
 
-            surface.blit(glow_big, self.rect.center, special_flags=pygame.BLEND_RGB_ADD)
-            surface.blit(glow_small, self.rect.center, special_flags=pygame.BLEND_RGB_ADD)
-            surface.blit(self.image, self.rect.center)
+            surface.blit(glow_big, (self.rect.center[0] - self.big_glow_size, self.rect.center[1] - self.big_glow_size), special_flags=pygame.BLEND_RGB_ADD)
+            surface.blit(glow_small, (self.rect.center[0] - self.small_glow_size, self.rect.center[1] - self.small_glow_size), special_flags=pygame.BLEND_RGB_ADD)
+            surface.blit(self.image, self.rect)
 
     def get_glow(self):
         if self.glow_grow:
