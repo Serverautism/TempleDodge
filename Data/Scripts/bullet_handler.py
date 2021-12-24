@@ -40,8 +40,15 @@ class BulletHandler:
                 self.time_since_last_bullet = 0
                 self.spawn_bullet()
 
+        to_remove = []
         for entity in self.bullets:
-            entity.update(surface)
+            if entity.dead:
+                to_remove.append(entity)
+            else:
+                entity.update(surface)
+
+        for entity in to_remove:
+            self.bullets.remove(entity)
 
     def spawn_bullet(self):
         # walls:

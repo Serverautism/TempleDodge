@@ -26,11 +26,14 @@ class Bullet:
         self.rect.x += self.velocity[0]
         self.rect.y += self.velocity[1]
 
-        glow_big, glow_small = self.get_glow()
+        self.check_dead()
+        if not self.dead:
 
-        surface.blit(glow_big, self.rect.center, special_flags=pygame.BLEND_RGB_ADD)
-        surface.blit(glow_small, self.rect.center, special_flags=pygame.BLEND_RGB_ADD)
-        surface.blit(self.image, self.rect.center)
+            glow_big, glow_small = self.get_glow()
+
+            surface.blit(glow_big, self.rect.center, special_flags=pygame.BLEND_RGB_ADD)
+            surface.blit(glow_small, self.rect.center, special_flags=pygame.BLEND_RGB_ADD)
+            surface.blit(self.image, self.rect.center)
 
     def get_glow(self):
         if self.glow_grow:
@@ -55,4 +58,14 @@ class Bullet:
         pygame.draw.circle(small_glow_surface, self.glow_color, (self.small_glow_size, self.small_glow_size), self.small_glow_size)
 
         return big_glow_surface, small_glow_surface
+
+    def check_dead(self):
+        if self.rect.center[0] + self.big_glow_size < 0:
+            self.dead = True
+        elif self.rect.center[0] - self.big_glow_size > 512:
+            self.dead = True
+        elif self.rect.center[1] + self.big_glow_size < 0:
+            self.dead = True
+        elif self.rect.center[1] - self.big_glow_size > 288:
+            self.dead = True
 
