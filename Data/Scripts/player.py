@@ -114,23 +114,41 @@ class Player:
         landed_rock_hit_list = pygame.sprite.spritecollide(self, self.landed_rocks, False, pygame.sprite.collide_mask)
         if len(landed_rock_hit_list) > 0:
             if self.dx > 0:
-                self.rect.x -= self.speed
+                if not self.is_ghost:
+                    self.rect.x -= self.speed
+                else:
+                    self.rect.x -= self.ghost_speed
             elif self.dx < 0:
-                self.rect.x += self.speed
+                if not self.is_ghost:
+                    self.rect.x += self.speed
+                else:
+                    self.rect.x += self.ghost_speed
 
         falling_rock_hit_list = pygame.sprite.spritecollide(self, self.falling_rocks, False, pygame.sprite.collide_mask)
         if len(falling_rock_hit_list) > 0:
             if self.dx > 0:
-                self.rect.x -= self.speed
+                if not self.is_ghost:
+                    self.rect.x -= self.speed
+                else:
+                    self.rect.x -= self.ghost_speed
             elif self.dx < 0:
-                self.rect.x += self.speed
+                if not self.is_ghost:
+                    self.rect.x += self.speed
+                else:
+                    self.rect.x += self.ghost_speed
 
         border_collision = pygame.sprite.spritecollide(self, [self.map_border], False, pygame.sprite.collide_mask)
         if border_collision:
             if self.dx > 0:
-                self.rect.x -= self.speed
+                if not self.is_ghost:
+                    self.rect.x -= self.speed
+                else:
+                    self.rect.x -= self.ghost_speed
             elif self.dx < 0:
-                self.rect.x += self.speed
+                if not self.is_ghost:
+                    self.rect.x += self.speed
+                else:
+                    self.rect.x += self.ghost_speed
 
     def check_collision_y(self):
         landed_rock_hit_list = pygame.sprite.spritecollide(self, self.landed_rocks, False, pygame.sprite.collide_mask)
