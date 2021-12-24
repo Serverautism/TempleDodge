@@ -38,6 +38,12 @@ class Player:
         self.jump_rotation = 0
         self.rotations_per_jump = 3
 
+        self.is_ghost = False
+        self.ghost_speed = 2
+        self.ghost_duration_time = 10
+        self.ghost_count = 0
+        self.godmode = True
+
         self.left_border_rect = pygame.rect.Rect(0, 0, 16, 288)
         self.right_border_rect = pygame.rect.Rect(512 - 16, 0, 16, 288)
         self.map_border = MapBorder()
@@ -45,6 +51,7 @@ class Player:
         self.idle_frames_length = 4
         self.jump_frames_length = 1
         self.run_frames_length = 4
+        self.ghost_frames_length = 1
 
         self.frame = 0
         self.frame_change = 0.2
@@ -53,6 +60,7 @@ class Player:
         self.idle_frames_left, self.idle_frames_right = load_frames('Data/Assets/Sprites/Player/Idle/player_idle_', self.idle_frames_length)
         self.jump_frames_left, self.jump_frames_right = load_frames('Data/Assets/Sprites/Player/Jump/player_jump_', self.jump_frames_length)
         self.run_frames_left, self.run_frames_right = load_frames('Data/Assets/Sprites/Player/Run/player_run_', self.run_frames_length)
+        self.ghost_frames_left, self.ghost_frames_right = load_frames('Data/Assets/Sprites/Player/Ghost/player_ghost_', self.ghost_frames_length)
 
         self.image = self.idle_frames_right[0]
         self.mask = pygame.mask.from_surface(self.image)
@@ -76,13 +84,20 @@ class Player:
         self.check_collision_x()
 
         # move y, check collision
-        self.calc_grav()
+        if not self.is_ghost:
+            self.calc_grav()
         self.rect.y += self.dy
         self.check_collision_y()
+
+        # check bullets
 
         # check chests and items
         self.check_chests()
         self.check_items()
+
+        # update ghost state
+        if self.is_ghost:
+            self.check_ghost_state()
 
         # get image and draw
         self.get_image()
@@ -132,7 +147,10 @@ class Player:
         falling_rock_hit_list = pygame.sprite.spritecollide(self, self.falling_rocks, False, pygame.sprite.collide_mask)
         for entity in falling_rock_hit_list:
             if self.dy <= 0:
-                print('dead')
+                if not self.godmode:
+                    self.hit()
+                else:
+                    print('dead')
             else:
                 self.rect.bottom = entity.rect.top
                 self.dy = 0
@@ -157,22 +175,58 @@ class Player:
                 if self.mana_count < self.max_mana:
                     self.mana_count += 1
 
+    def check_ghost_state(self):
+        self.ghost_count += 1
+        if self.ghost_count / 60 >= self.ghost_duration_time:
+            self.is_ghost = False
+            self.ghost_count = 0
+            self.frame = 0
+
     def go_left(self):
-        self.dx = -self.speed
-        self.direction = 'L'
-        if self.state != 'jump':
-            self.state = 'run'
+        if not self.is_ghost:
+            self.dx = -self.speed
+            self.direction = 'L'
+            if self.state != 'jump':
+                self.state = 'run'
+        else:
+            self.dx = -self.ghost_speed
+            self.direction = 'L'
 
     def go_right(self):
-        self.dx = self.speed
-        self.direction = 'R'
-        if self.state != 'jump':
-            self.state = 'run'
+        if not self.is_ghost:
+            self.dx = self.speed
+            self.direction = 'R'
+            if self.state != 'jump':
+                self.state = 'run'
+        else:
+            self.dx = self.ghost_speed
+            self.direction = 'R'
+
+    def go_up(self):
+        if self.is_ghost:
+            self.dy = -self.ghost_speed
+
+    def go_down(self):
+        if not self.is_ghost:
+            if self.state == 'jump':
+                self.dy = self.jump_vel
+        else:
+            self.dy = self.ghost_speed
+
+    def enable_ghost_mode(self):
+        if self.mana_count == self.max_mana:
+            self.is_ghost = True
+            self.mana_count = 0
+            self.dy = 0
 
     def stop(self):
         self.dx = 0
         if self.state != 'jump':
             self.state = 'idle'
+
+    def stop_ghost_y(self):
+        if self.is_ghost:
+            self.dy = 0
 
     def jump(self):
         if self.jump_count == 0:
@@ -196,9 +250,8 @@ class Player:
             self.jump_rotation = 0
             self.jump_spin_done = False
 
-    def smash_down(self):
-        if self.state == 'jump':
-            self.dy = self.jump_vel
+    def hit(self):
+        pass
 
     def get_image(self):
         before_rect = self.rect.copy()
@@ -208,39 +261,51 @@ class Player:
             self.frame += 1
             self.frame_count = 0
 
-        # running
-        if self.state == 'run':
-            if self.frame > self.run_frames_length - 1:
+        # if player is not ghost
+        if not self.is_ghost:
+            # running
+            if self.state == 'run':
+                if self.frame > self.run_frames_length - 1:
+                    self.frame = 0
+
+                if self.direction == 'L':
+                    self.image = self.run_frames_left[self.frame]
+                else:
+                    self.image = self.run_frames_right[self.frame]
+            # jumping
+            elif self.state == 'jump':
+                if self.frame > self.jump_frames_length - 1:
+                    self.frame = 0
+
+                if not self.jump_spin_done:
+                    self.jump_rotation += self.jump_spin_degrees
+                    if self.jump_rotation >= 360 * self.rotations_per_jump:
+                        self.jump_rotation = 0
+                        self.jump_spin_done = True
+
+                if self.direction == 'L':
+                    self.image = pygame.transform.rotate(self.jump_frames_left[self.frame], self.jump_rotation)
+                else:
+                    self.image = pygame.transform.rotate(self.jump_frames_right[self.frame], -self.jump_rotation)
+            # idle
+            elif self.state == 'idle':
+                if self.frame > self.idle_frames_length - 1:
+                    self.frame = 0
+
+                if self.direction == 'L':
+                    self.image = self.idle_frames_left[self.frame]
+                else:
+                    self.image = self.idle_frames_right[self.frame]
+
+        # if player is ghost
+        else:
+            if self.frame > self.ghost_frames_length - 1:
                 self.frame = 0
 
             if self.direction == 'L':
-                self.image = self.run_frames_left[self.frame]
+                self.image = self.ghost_frames_left[self.frame]
             else:
-                self.image = self.run_frames_right[self.frame]
-        # jumping
-        elif self.state == 'jump':
-            if self.frame > self.jump_frames_length - 1:
-                self.frame = 0
-
-            if not self.jump_spin_done:
-                self.jump_rotation += self.jump_spin_degrees
-                if self.jump_rotation >= 360 * self.rotations_per_jump:
-                    self.jump_rotation = 0
-                    self.jump_spin_done = True
-
-            if self.direction == 'L':
-                self.image = pygame.transform.rotate(self.jump_frames_left[self.frame], self.jump_rotation)
-            else:
-                self.image = pygame.transform.rotate(self.jump_frames_right[self.frame], -self.jump_rotation)
-        # idle
-        elif self.state == 'idle':
-            if self.frame > self.idle_frames_length - 1:
-                self.frame = 0
-
-            if self.direction == 'L':
-                self.image = self.idle_frames_left[self.frame]
-            else:
-                self.image = self.idle_frames_right[self.frame]
+                self.image = self.ghost_frames_right[self.frame]
 
         self.rect = self.image.get_rect()
         self.rect.center = before_rect.center

@@ -10,6 +10,7 @@ class Game:
 
         # bool
         self.running = True
+        self.round_over = False
 
         # numbers
         self.screen_width = 1920
@@ -136,16 +137,22 @@ class Game:
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     self.player.jump()
-                elif event.key == pygame.K_s:
-                    self.player.smash_down()
+                elif event.key == pygame.K_f:
+                    self.player.enable_ghost_mode()
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_a]:
             self.player.go_left()
         if keys[pygame.K_d]:
             self.player.go_right()
+        if keys[pygame.K_s]:
+            self.player.go_down()
+        if keys[pygame.K_w]:
+            self.player.go_up()
         if (keys[pygame.K_a] and keys[pygame.K_d]) or (not keys[pygame.K_a] and not keys[pygame.K_d]):
             self.player.stop()
+        if (keys[pygame.K_w] and keys[pygame.K_s]) or (not keys[pygame.K_w] and not keys[pygame.K_s]):
+            self.player.stop_ghost_y()
 
     def update_chests(self, surface):
         to_remove = []
