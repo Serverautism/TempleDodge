@@ -83,3 +83,10 @@ class BulletHandler:
 
         self.bullets.append(bullet.Bullet(velocity, position))
 
+    def reset(self):
+        self.time_since_last_phase = 0
+        self.time_since_last_bullet = 0
+        self.phase_count = 0
+        self.phase = False
+        self.bullets.clear()
+

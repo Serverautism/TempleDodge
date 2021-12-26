@@ -21,7 +21,7 @@ class MapBorder:
 
 
 class Player:
-    def __init__(self, render_pos, landed_rocks=None, falling_rocks=None, chests=None, items=None, bullets=None):
+    def __init__(self, render_pos, landed_rocks, falling_rocks, chests, items, bullets):
         self.pos = render_pos
         self.x, self.y = render_pos
         self.direction = 'R'
@@ -42,7 +42,8 @@ class Player:
         self.ghost_speed = 2
         self.ghost_duration_time = 10
         self.ghost_count = 0
-        self.godmode = True
+        self.godmode = False
+        self.dead = False
 
         self.left_border_rect = pygame.rect.Rect(0, 0, 16, 288)
         self.right_border_rect = pygame.rect.Rect(512 - 16, 0, 16, 288)
@@ -79,31 +80,32 @@ class Player:
         self.max_mana = 7
 
     def update(self, surface, paused):
-        if not paused:
-            # move x, check collision
-            self.rect.x += self.dx
-            self.check_collision_x()
+        if not self.dead:
+            if not paused:
+                # move x, check collision
+                self.rect.x += self.dx
+                self.check_collision_x()
 
-            # move y, check collision
-            if not self.is_ghost:
-                self.calc_grav()
-            self.rect.y += self.dy
-            self.check_collision_y()
+                # move y, check collision
+                if not self.is_ghost:
+                    self.calc_grav()
+                self.rect.y += self.dy
+                self.check_collision_y()
 
-            # check bullets
-            self.check_bullets()
+                # check bullets
+                self.check_bullets()
 
-            # check chests and items
-            self.check_chests()
-            self.check_items()
+                # check chests and items
+                self.check_chests()
+                self.check_items()
 
-            # update ghost state
-            if self.is_ghost:
-                self.check_ghost_state()
+                # update ghost state
+                if self.is_ghost:
+                    self.check_ghost_state()
 
-            # get image and draw
-            self.get_image()
-        surface.blit(self.image, self.rect)
+                # get image and draw
+                self.get_image()
+            surface.blit(self.image, self.rect)
 
     def calc_grav(self):
         # Calculate effect of gravity
@@ -281,7 +283,7 @@ class Player:
             self.jump_spin_done = False
 
     def hit(self):
-        pass
+        self.dead = True
 
     def get_image(self):
         before_rect = self.rect.copy()
@@ -340,3 +342,20 @@ class Player:
         self.rect = self.image.get_rect()
         self.rect.center = before_rect.center
         self.mask = pygame.mask.from_surface(self.image)
+
+    def reset(self, center):
+        self.dead = False
+        self.gold_count = 0
+        self.mana_count = 0
+        self.direction = 'R'
+        self.state = 'idle'
+        self.rect.center = center
+        self.jump_count = self.max_jumps
+        self.dx = 0
+        self.dy = 0
+        self.jump_spin_done = False
+        self.jump_rotation = 0
+        self.is_ghost = False
+        self.ghost_count = 0
+        self.frame = 0
+        self.frame_count = 0

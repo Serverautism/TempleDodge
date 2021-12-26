@@ -31,7 +31,8 @@ class RockHandler:
 
         self.rock_speed = 1
         self.time_since_last_spawn = 0
-        self.spawn_time = 60 / rocks_per_second
+        self.rocks_per_second = rocks_per_second
+        self.spawn_time = 60 / self.rocks_per_second
         self.pushed_down_counter = 0
         self.max_collum_difference = 4
 
@@ -41,7 +42,9 @@ class RockHandler:
         self.chests = []
         self.items = []
 
-        self.map_of_landed_rocks = self.landed_map_default
+        self.map_of_landed_rocks = self.landed_map_default.copy()
+        self.map_of_landed_rocks[-2][0] = 1
+        print(self.landed_map_default)
         self.row_counter = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 
         self.generate_landed_rocks()
@@ -97,7 +100,7 @@ class RockHandler:
                 else:
                     self.pushed_down_counter = 0
                     for i in range(-1, -len(self.map_of_landed_rocks), -1):
-                        self.map_of_landed_rocks[i] = self.map_of_landed_rocks[i - 1]
+                        self.map_of_landed_rocks[i] = self.map_of_landed_rocks[i - 1].copy()
                     self.map_of_landed_rocks[0] = self.landed_map_default[0].copy()
                     for i in range(len(self.row_counter)):
                         self.row_counter[i] -= 1
@@ -107,4 +110,16 @@ class RockHandler:
             x, y = funcs.grid_pos_to_render_pos((i, 17))
             self.landed_rocks.append(rock.Rock((x, y), self.rock_speed, True))
 
+    def reset(self):
+        self.time_since_last_spawn = 0
+        self.pushed_down_counter = 0
+        self.falling_rocks.clear()
+        self.landed_rocks.clear()
 
+        self.chests.clear()
+        self.items.clear()
+
+        self.map_of_landed_rocks = self.landed_map_default.copy()
+        self.row_counter = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+
+        self.generate_landed_rocks()

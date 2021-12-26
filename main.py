@@ -13,6 +13,8 @@ class Game:
         self.running = True
         self.round_over = False
         self.paused = False
+        self.checked_for_new_highscore = False
+        self.new_highscore = False
 
         # numbers
         self.screen_width = 1920
@@ -48,15 +50,20 @@ class Game:
         self.map_shadow_t_20_count = random.randint(0, 60)
         self.map_shadow_t_20_frame = random.randint(0, 2)
 
+        self.highscore = 0
+
         # iterable
         self.screen_dimensions = (self.screen_width, self.screen_height)
         self.render_dimensions = (self.render_width, self.render_height)
+
+        self.player_spawn = (self.render_width / 2, self.render_height / 2)
 
         self.items = []
         self.particles = []
 
         with open('Data/Files/gamesave.json', 'r') as f:
             self.game_save = json.load(f)
+            self.highscore = self.game_save['highscore']
 
         # objects
         screen_flags = pygame.DOUBLEBUF, pygame.HWSURFACE
@@ -69,7 +76,7 @@ class Game:
         self.render_surface.set_colorkey(colors.black)
         self.rock_handler = rock_handler.RockHandler(10, 0)
         self.bullet_handler = bullet_handler.BulletHandler(1, 5, 20, 10)
-        self.player = player.Player((100, 100), landed_rocks=self.rock_handler.landed_rocks, falling_rocks=self.rock_handler.falling_rocks, chests=self.rock_handler.chests, items=self.items, bullets=self.bullet_handler.bullets)
+        self.player = player.Player(self.player_spawn, self.rock_handler.landed_rocks, self.rock_handler.falling_rocks, self.rock_handler.chests, self.items, self.bullet_handler.bullets)
         self.hud = hud.Hud(self.player)
 
         # dependent lists
@@ -129,6 +136,11 @@ class Game:
             self.bullet_handler.update(self.render_surface, self.paused)
             self.hud.update(self.render_surface, self.paused)
 
+            if self.player.dead:
+                if not self.checked_for_new_highscore:
+                    self.check_highscore()
+                self.hud.display_dead(self.render_surface, self.player.gold_count, self.highscore, self.new_highscore)
+
             # map shadows
             self.draw_map_shadows(self.render_surface)
 
@@ -154,6 +166,9 @@ class Game:
                             self.paused = False
                         else:
                             self.paused = True
+                elif event.key == pygame.K_r:
+                    if self.player.dead:
+                        self.prepare_new_round()
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_a]:
@@ -205,7 +220,7 @@ class Game:
 
     def draw_background(self, surface):
         # base color
-        surface.fill(colors.grey_3)
+        surface.fill(colors.grey_4)
 
         # rects
         for rect in self.background_rects:
@@ -250,7 +265,7 @@ class Game:
             shadow_start = [line[0][0], line[0][1] + 5]
             shadow_end = [line[1][0], line[1][1] + 5]
             pygame.draw.line(surface, shadow_color, shadow_start, shadow_end, self.background_lines_width)
-            pygame.draw.line(surface, colors.grey_5, line[0], line[1], self.background_lines_width)
+            pygame.draw.line(surface, colors.grey_6, line[0], line[1], self.background_lines_width)
 
         # map border
         surface.blit(self.map_border_image, (0, 0))
@@ -400,8 +415,25 @@ class Game:
             rects.append([image, [x, y], size, rotation])
         return rects
 
+    def prepare_new_round(self):
+        self.checked_for_new_highscore = False
+        self.player.reset(self.player_spawn)
+        self.rock_handler.reset()
+        self.bullet_handler.reset()
+        self.items.clear()
+
+    def check_highscore(self):
+        self.checked_for_new_highscore = True
+        if self.highscore < self.player.gold_count:
+            self.new_highscore = True
+            self.game_save['highscore'] = self.player.gold_count
+            self.highscore = self.player.gold_count
+
     def exit(self):
-        # save here
+        # save
+        with open('Data/Files/gamesave.json', 'w') as f:
+            json.dump(self.game_save, f, indent=4)
+        # exit
         self.running = False
 
 

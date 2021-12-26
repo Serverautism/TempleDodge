@@ -41,11 +41,13 @@ class Item:
 
         if not paused:
             # move left right, check collision
-            self.rect.x += self.velocity[0]
+            self.center[0] += self.velocity[0]
+            self.rect.centerx = self.center[0]
             self.check_collision_x()
 
             # move up down, check collision
-            self.rect.y += self.velocity[1]
+            self.center[1] += self.velocity[1]
+            self.rect.centery = self.center[1]
             self.check_collision_y()
             self.apply_gravity()
 
@@ -55,19 +57,16 @@ class Item:
     def check_collision_x(self):
         landed_rock_hit_list = pygame.sprite.spritecollide(self, self.landed_rocks, False)
         if len(landed_rock_hit_list) > 0:
-            for entity in landed_rock_hit_list:
-                if self.velocity[0] > 0:
-                    self.rect.right = entity.rect.left
-                elif self.velocity[0] < 0:
-                    self.rect.left = entity.rect.right
+            self.center[0] -= self.velocity[0]
+            self.rect.centerx = self.center[0]
+
             self.velocity[0] *= -.75
 
         falling_rock_hit_list = pygame.sprite.spritecollide(self, self.falling_rocks, False)
         if len(falling_rock_hit_list) > 0:
-            if self.velocity[0] > 0:
-                self.rect.x -= self.velocity[0]
-            elif self.velocity[0] < 0:
-                self.rect.x -= self.velocity[0]
+            if self.velocity[0] != 0:
+                self.center[0] -= self.velocity[0]
+                self.rect.centerx = self.center[0]
             self.velocity[0] *= -.75
 
         if self.rect.colliderect(self.left_border_rect):
@@ -82,10 +81,8 @@ class Item:
         landed_rock_hit_list = pygame.sprite.spritecollide(self, self.landed_rocks, False)
         if len(landed_rock_hit_list) > 0:
             if self.velocity[1] != 0:
-                if self.gravity * -2 < self.velocity[1] < self.gravity * 2:
-                    self.velocity[1] = 0
-                else:
-                    self.rect.y -= self.velocity[1]
+                self.center[1] -= self.velocity[1]
+                self.rect.centery = self.center[1]
             self.velocity[1] *= -.25
 
         falling_rock_hit_list = pygame.sprite.spritecollide(self, self.falling_rocks, False)
@@ -93,7 +90,8 @@ class Item:
             if self.rect.y >= entity.rect.y:
                 self.collected = True
             else:
-                self.rect.y -= self.velocity[1]
+                self.center[1] -= self.velocity[1]
+                self.rect.centery = self.center[1]
                 self.velocity[1] *= -.25
 
     def apply_gravity(self):

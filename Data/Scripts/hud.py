@@ -15,6 +15,7 @@ class Hud:
         self.player = player
         self.mana_position = funcs.grid_pos_to_render_pos((1, 1))[0] - 1, funcs.grid_pos_to_render_pos((1, 1))[1]
         self.font = font.Font('Data/Assets/Font/Font.ttf', 8)
+        self.new_highscore_font = font.Font('Data/Assets/Font/Font.ttf', 10)
 
         self.last_mana_count = self.player.mana_count
         self.last_gold_count = self.player.gold_count
@@ -24,6 +25,14 @@ class Hud:
         self.paused_render = self.render_paused()
         self.paused_render_x = self.render_width / 2 - self.paused_render.get_width() / 2
         self.paused_render_y = self.render_height / 2 - self.paused_render.get_height() / 2
+
+        self.r_icon = pygame.image.load('Data/Assets/Sprites/Gui/r_icon.png')
+        self.new_highscore_text = 'NEW HIGHSCORE'
+        self.new_highscore_render = self.new_highscore_font.render(self.new_highscore_text, True, colors.font_color)
+        self.new_highscore_direction = 'R'
+        self.new_highscore_rotation = 0
+        self.new_highscore_rotation_change = 2
+        self.new_highscore_center = (self.render_width / 2, self.render_height / 2 - 15)
 
         self.mana_frame = pygame.image.load('Data/Assets/Sprites/Gui/frame_mana.png').convert_alpha()
         self.mana_frame_rect = self.mana_frame.get_rect()
@@ -44,7 +53,7 @@ class Hud:
         self.render_surface = pygame.Surface((self.render_width, self.render_height))
         self.render_surface.set_colorkey((0, 0, 0))
 
-        self.render(self.last_mana_count, self.last_gold_count)
+        self.render_hud(self.last_mana_count, self.last_gold_count)
 
     def update(self, surface, paused):
         # get the counts
@@ -52,7 +61,7 @@ class Hud:
         mana = self.player.mana_count
 
         if gold != self.last_gold_count or mana != self.last_mana_count:
-            self.render(mana, gold)
+            self.render_hud(mana, gold)
             self.last_mana_count = mana
             self.last_gold_count = gold
 
@@ -61,11 +70,44 @@ class Hud:
         if paused:
             self.display_paused(surface)
 
+    def display_dead(self, surface, score, highscore, new_highscore):
+        score_text = f'score: {score}, highscore: {highscore}'
+        score_text_render = self.font.render(score_text, True, colors.font_color)
+        score_text_render_x = self.render_width / 2 - score_text_render.get_width() / 2
+        score_text_render_y = self.render_height / 2 - score_text_render.get_height() / 2
+
+        replay_text = 'press R to play again'
+        replay_text_render = self.font.render(replay_text, True, colors.font_color)
+        r_icon_y = score_text_render_y + 10
+        replay_text_render_x = self.render_width / 2 - replay_text_render.get_width() / 2
+        r_icon_x = replay_text_render_x - self.r_icon.get_width() - 10
+        replay_text_render_y = r_icon_y + self.r_icon.get_height() / 2 - replay_text_render.get_height() / 2
+
+        surface.blit(score_text_render, (score_text_render_x, score_text_render_y))
+        surface.blit(replay_text_render, (replay_text_render_x, replay_text_render_y))
+        surface.blit(self.r_icon, (r_icon_x, r_icon_y))
+
+        if new_highscore:
+            if self.new_highscore_direction == 'R':
+                self.new_highscore_rotation += self.new_highscore_rotation_change
+                if self.new_highscore_rotation >= 25:
+                    self.new_highscore_direction = 'L'
+            else:
+                self.new_highscore_rotation -= self.new_highscore_rotation_change
+                if self.new_highscore_rotation <= -25:
+                    self.new_highscore_direction = 'R'
+
+            new_highscore_render = pygame.transform.rotate(self.new_highscore_render, self.new_highscore_rotation)
+            new_highscore_render_rect = new_highscore_render.get_rect()
+            new_highscore_render_rect.center = self.new_highscore_center
+
+            surface.blit(new_highscore_render, new_highscore_render_rect)
+
     def display_paused(self, surface):
         surface.blit(self.paused_render, (self.paused_render_x, self.paused_render_y))
 
     def render_paused(self):
-        textrender = self.font.render(self.paused_text, True, colors.grey_3)
+        textrender = self.font.render(self.paused_text, True, colors.font_color)
 
         width = textrender.get_width() + self.paused_icon.get_width() + 10
         height = self.paused_icon.get_height()
@@ -77,7 +119,7 @@ class Hud:
 
         return render_surface
 
-    def render(self, mana, gold):
+    def render_hud(self, mana, gold):
         print('rendered')
         self.render_surface.fill((0, 0, 0))
         # draw the frames
