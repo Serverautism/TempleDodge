@@ -1,5 +1,6 @@
 import pygame
 import random
+import json
 
 from Data.Scripts import colors, rock_handler, bullet_handler, player, hud
 
@@ -11,6 +12,7 @@ class Game:
         # bool
         self.running = True
         self.round_over = False
+        self.paused = False
 
         # numbers
         self.screen_width = 1920
@@ -53,6 +55,9 @@ class Game:
         self.items = []
         self.particles = []
 
+        with open('Data/Files/gamesave.json', 'r') as f:
+            self.game_save = json.load(f)
+
         # objects
         screen_flags = pygame.DOUBLEBUF, pygame.HWSURFACE
         self.screen = pygame.display.set_mode(self.screen_dimensions, *screen_flags)
@@ -62,12 +67,12 @@ class Game:
         self.clock = pygame.time.Clock()
         self.render_surface = pygame.Surface(self.render_dimensions).convert_alpha()
         self.render_surface.set_colorkey(colors.black)
-        self.rock_handler = rock_handler.RockHandler()
+        self.rock_handler = rock_handler.RockHandler(10, 0)
         self.bullet_handler = bullet_handler.BulletHandler(1, 5, 20, 10)
         self.player = player.Player((100, 100), landed_rocks=self.rock_handler.landed_rocks, falling_rocks=self.rock_handler.falling_rocks, chests=self.rock_handler.chests, items=self.items, bullets=self.bullet_handler.bullets)
         self.hud = hud.Hud(self.player)
 
-        # more lists
+        # dependent lists
         self.chests = self.rock_handler.chests
 
         # images
@@ -113,18 +118,20 @@ class Game:
             self.screen.fill('black')
             # input
             self.handle_input()
-            # background
-            self.draw_background(self.render_surface)
-            # entitys in right order
-            self.rock_handler.update(True, .1, self.render_surface)
-            self.update_chests(self.render_surface)
-            self.player.update(self.render_surface)
-            self.update_items(self.render_surface)
-            self.bullet_handler.update(self.render_surface)
-            self.hud.update(self.render_surface)
 
-            # map shadows
-            self.draw_map_shadows(self.render_surface)
+            if not self.paused:
+                # background
+                self.draw_background(self.render_surface)
+                # entitys in right order
+                self.rock_handler.update(True, self.render_surface)
+                self.update_chests(self.render_surface)
+                self.player.update(self.render_surface)
+                self.update_items(self.render_surface)
+                self.bullet_handler.update(self.render_surface)
+                self.hud.update(self.render_surface)
+
+                # map shadows
+                self.draw_map_shadows(self.render_surface)
             # scale image
             self.screen.blit(pygame.transform.scale(self.render_surface, self.screen_dimensions), (0, 0))
             # update screen
@@ -141,6 +148,12 @@ class Game:
                     self.player.jump()
                 elif event.key == pygame.K_f:
                     self.player.enable_ghost_mode()
+                elif event.key == pygame.K_ESCAPE:
+                    if not self.round_over:
+                        if self.paused:
+                            self.paused = False
+                        else:
+                            self.paused = True
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_a]:

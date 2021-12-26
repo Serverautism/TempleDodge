@@ -90,6 +90,7 @@ class Player:
         self.check_collision_y()
 
         # check bullets
+        self.check_bullets()
 
         # check chests and items
         self.check_chests()
@@ -178,6 +179,15 @@ class Player:
                     self.state = 'run'
                 else:
                     self.state = 'idle'
+
+    def check_bullets(self):
+        bullet_hit_list = pygame.sprite.spritecollide(self, self.bullets, False, pygame.sprite.collide_mask)
+        if len(bullet_hit_list) > 0:
+            if not self.godmode:
+                self.hit()
+            else:
+                print('hit bullet')
+                pass
 
     def check_chests(self):
         for chest in self.chests:

@@ -7,7 +7,7 @@ from . import funcs
 
 
 class RockHandler:
-    def __init__(self):
+    def __init__(self, rocks_per_second, rocks_per_second_change):
         self.landed_map_default = [
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -31,6 +31,7 @@ class RockHandler:
 
         self.rock_speed = 1
         self.time_since_last_spawn = 0
+        self.spawn_time = 60 / rocks_per_second
         self.pushed_down_counter = 0
         self.max_collum_difference = 4
 
@@ -45,11 +46,10 @@ class RockHandler:
 
         self.generate_landed_rocks()
 
-    def update(self, spawn_rocks, spawntime, surface):
+    def update(self, spawn_rocks, surface):
         # spawn rocks
         self.time_since_last_spawn += 1
-        if spawn_rocks and self.time_since_last_spawn / 60 >= spawntime:
-            rows_max_index = self.row_counter.index(max(self.row_counter))
+        if spawn_rocks and self.time_since_last_spawn >= self.spawn_time:
             rows_min_index = self.row_counter.index(min(self.row_counter))
             self.time_since_last_spawn = 0
             x = random.randint(1, 30)
