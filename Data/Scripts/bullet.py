@@ -2,13 +2,17 @@ import pygame
 
 
 class Bullet:
-    def __init__(self, velocity, position):
+    def __init__(self, velocity, position, wall):
         self.velocity = velocity
         self.position = position
+        self.wall = wall
         self.image = pygame.image.load('Data/Assets/Sprites/Bullets/bullet.png').convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.center = position
         self.sparkle_frames_length = 8
+        self.frame = 0
+        self.frame_change = .1
+        self.frame_count = 0
 
         self.glow_color = (20, 0, 44)
 
@@ -17,11 +21,30 @@ class Bullet:
 
         self.glow_grow = True
         self.dead = False
+        self.sparkle_done = False
 
         self.sparkle_frames = []
         for i in range(self.sparkle_frames_length):
             image = pygame.image.load(f'Data/Assets/Sprites/Bullets/Sparkle/sparkle_{i + 1}.png').convert_alpha()
-            self.sparkle_frames.append(image)
+
+            if self.wall == 2:
+                self.sparkle_frames.append(image)
+            elif self.wall == 1:
+                self.sparkle_frames.append(pygame.transform.rotate(image, 90))
+            else:
+                self.sparkle_frames.append(pygame.transform.flip(image, True, False))
+
+        self.sparkle_image = self.sparkle_frames[0]
+
+        if self.wall == 0:
+            self.render_x = position[0]
+            self.render_y = position[1] - self.sparkle_image.get_height() / 2
+        elif self.wall == 1:
+            self.render_x = position[0] - self.sparkle_image.get_width() / 2
+            self.render_y = position[1]
+        else:
+            self.render_x = position[0] - self.sparkle_image.get_width()
+            self.render_y = position[1] - self.sparkle_image.get_height() / 2
 
     def update(self, surface, paused):
         if not paused:
@@ -29,6 +52,9 @@ class Bullet:
             self.position[0] += self.velocity[0]
             self.position[1] += self.velocity[1]
             self.rect.center = self.position
+
+            if not self.sparkle_done:
+                self.draw_sparkle(surface)
 
             self.check_dead()
 
@@ -73,4 +99,18 @@ class Bullet:
             self.dead = True
         elif self.rect.center[1] - self.big_glow_size > 288:
             self.dead = True
+
+    def draw_sparkle(self, surface):
+        self.frame_count += 1
+        if self.frame_count / 60 >= self.frame_change:
+            self.frame_count = 0
+            self.frame += 1
+
+            if self.frame == self.sparkle_frames_length - 1:
+                self.sparkle_done = True
+                return
+
+            self.sparkle_image = self.sparkle_frames[self.frame]
+
+        surface.blit(self.sparkle_image, (self.render_x, self.render_y))
 

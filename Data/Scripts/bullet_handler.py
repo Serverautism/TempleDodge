@@ -81,7 +81,7 @@ class BulletHandler:
             while velocity[0] == 0 or velocity[1] == 0:
                 velocity = [randint(5, 20) / -10, randint(0, 40) / 10 - 2]
 
-        self.bullets.append(bullet.Bullet(velocity, position))
+        self.bullets.append(bullet.Bullet(velocity, position, wall_number))
 
     def reset(self):
         self.time_since_last_phase = 0

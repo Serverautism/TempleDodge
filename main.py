@@ -417,6 +417,7 @@ class Game:
 
     def prepare_new_round(self):
         self.checked_for_new_highscore = False
+        self.new_highscore = False
         self.player.reset(self.player_spawn)
         self.rock_handler.reset()
         self.bullet_handler.reset()

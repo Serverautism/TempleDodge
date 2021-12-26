@@ -1,5 +1,6 @@
 import pygame
 import random
+import copy
 
 from . import rock
 from . import chest
@@ -42,9 +43,7 @@ class RockHandler:
         self.chests = []
         self.items = []
 
-        self.map_of_landed_rocks = self.landed_map_default.copy()
-        self.map_of_landed_rocks[-2][0] = 1
-        print(self.landed_map_default)
+        self.map_of_landed_rocks = copy.deepcopy(self.landed_map_default)
         self.row_counter = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 
         self.generate_landed_rocks()
@@ -119,7 +118,7 @@ class RockHandler:
         self.chests.clear()
         self.items.clear()
 
-        self.map_of_landed_rocks = self.landed_map_default.copy()
+        self.map_of_landed_rocks = copy.deepcopy(self.landed_map_default)
         self.row_counter = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 
         self.generate_landed_rocks()
