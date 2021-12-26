@@ -34,6 +34,15 @@ class Hud:
         self.new_highscore_rotation_change = 2
         self.new_highscore_center = (self.render_width / 2, self.render_height / 2 - 15)
 
+        self.score_text_render = None
+        self.replay_text_render = None
+        self.score_text_render_x = 0
+        self.score_text_render_y = 0
+        self.r_icon_x = 0
+        self.r_icon_y = 0
+        self.replay_text_render_x = 0
+        self.replay_text_render_y = 0
+
         self.mana_frame = pygame.image.load('Data/Assets/Sprites/Gui/frame_mana.png').convert_alpha()
         self.mana_frame_rect = self.mana_frame.get_rect()
         self.mana_frame_rect.x, self.mana_frame_rect.y = self.mana_position
@@ -70,22 +79,10 @@ class Hud:
         if paused:
             self.display_paused(surface)
 
-    def display_dead(self, surface, score, highscore, new_highscore):
-        score_text = f'score: {score}, highscore: {highscore}'
-        score_text_render = self.font.render(score_text, True, colors.font_color)
-        score_text_render_x = self.render_width / 2 - score_text_render.get_width() / 2
-        score_text_render_y = self.render_height / 2 - score_text_render.get_height() / 2
-
-        replay_text = 'press R to play again'
-        replay_text_render = self.font.render(replay_text, True, colors.font_color)
-        r_icon_y = score_text_render_y + 10
-        replay_text_render_x = self.render_width / 2 - replay_text_render.get_width() / 2
-        r_icon_x = replay_text_render_x - self.r_icon.get_width() - 10
-        replay_text_render_y = r_icon_y + self.r_icon.get_height() / 2 - replay_text_render.get_height() / 2
-
-        surface.blit(score_text_render, (score_text_render_x, score_text_render_y))
-        surface.blit(replay_text_render, (replay_text_render_x, replay_text_render_y))
-        surface.blit(self.r_icon, (r_icon_x, r_icon_y))
+    def display_dead(self, surface, new_highscore):
+        surface.blit(self.score_text_render, (self.score_text_render_x, self.score_text_render_y))
+        surface.blit(self.replay_text_render, (self.replay_text_render_x, self.replay_text_render_y))
+        surface.blit(self.r_icon, (self.r_icon_x, self.r_icon_y))
 
         if new_highscore:
             if self.new_highscore_direction == 'R':
@@ -102,6 +99,19 @@ class Hud:
             new_highscore_render_rect.center = self.new_highscore_center
 
             surface.blit(new_highscore_render, new_highscore_render_rect)
+    
+    def render_dead(self, score, highscore):
+        score_text = f'score: {score}, highscore: {highscore}'
+        self.score_text_render = self.font.render(score_text, True, colors.font_color)
+        self.score_text_render_x = self.render_width / 2 - self.score_text_render.get_width() / 2
+        self.score_text_render_y = self.render_height / 2 - self.score_text_render.get_height() / 2
+
+        replay_text = 'press R to play again'
+        self.replay_text_render = self.font.render(replay_text, True, colors.font_color)
+        self.r_icon_y = self.score_text_render_y + 10
+        self.replay_text_render_x = self.render_width / 2 - self.replay_text_render.get_width() / 2
+        self.r_icon_x = self.replay_text_render_x - self.r_icon.get_width() - 10
+        self.replay_text_render_y = self.r_icon_y + self.r_icon.get_height() / 2 - self.replay_text_render.get_height() / 2
 
     def display_paused(self, surface):
         surface.blit(self.paused_render, (self.paused_render_x, self.paused_render_y))

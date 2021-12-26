@@ -139,7 +139,8 @@ class Game:
             if self.player.dead:
                 if not self.checked_for_new_highscore:
                     self.check_highscore()
-                self.hud.display_dead(self.render_surface, self.player.gold_count, self.highscore, self.new_highscore)
+                    self.hud.render_dead(self.player.gold_count, self.highscore)
+                self.hud.display_dead(self.render_surface, self.new_highscore)
 
             # map shadows
             self.draw_map_shadows(self.render_surface)
