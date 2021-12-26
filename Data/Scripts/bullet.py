@@ -53,9 +53,6 @@ class Bullet:
             self.position[1] += self.velocity[1]
             self.rect.center = self.position
 
-            if not self.sparkle_done:
-                self.draw_sparkle(surface)
-
             self.check_dead()
 
         if not self.dead:
@@ -65,6 +62,9 @@ class Bullet:
             surface.blit(glow_big, (self.rect.center[0] - self.big_glow_size, self.rect.center[1] - self.big_glow_size), special_flags=pygame.BLEND_RGB_ADD)
             surface.blit(glow_small, (self.rect.center[0] - self.small_glow_size, self.rect.center[1] - self.small_glow_size), special_flags=pygame.BLEND_RGB_ADD)
             surface.blit(self.image, self.rect)
+
+        if not self.sparkle_done:
+            self.draw_sparkle(surface)
 
     def get_glow(self):
         if self.glow_grow:

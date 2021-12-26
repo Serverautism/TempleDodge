@@ -15,7 +15,7 @@ class Hud:
         self.player = player
         self.mana_position = funcs.grid_pos_to_render_pos((1, 1))[0] - 1, funcs.grid_pos_to_render_pos((1, 1))[1]
         self.font = font.Font('Data/Assets/Font/Font.ttf', 8)
-        self.new_highscore_font = font.Font('Data/Assets/Font/Font.ttf', 10)
+        self.new_highscore_font = font.Font('Data/Assets/Font/Font.ttf', 15)
 
         self.last_mana_count = self.player.mana_count
         self.last_gold_count = self.player.gold_count
@@ -32,7 +32,8 @@ class Hud:
         self.new_highscore_direction = 'R'
         self.new_highscore_rotation = 0
         self.new_highscore_rotation_change = 2
-        self.new_highscore_center = (self.render_width / 2, self.render_height / 2 - 15)
+        self.new_highscore_rotation_max = 10
+        self.new_highscore_center = (self.render_width / 2, self.render_height / 2 - 25)
 
         self.score_text_render = None
         self.replay_text_render = None
@@ -87,11 +88,11 @@ class Hud:
         if new_highscore:
             if self.new_highscore_direction == 'R':
                 self.new_highscore_rotation += self.new_highscore_rotation_change
-                if self.new_highscore_rotation >= 25:
+                if self.new_highscore_rotation >= self.new_highscore_rotation_max:
                     self.new_highscore_direction = 'L'
             else:
                 self.new_highscore_rotation -= self.new_highscore_rotation_change
-                if self.new_highscore_rotation <= -25:
+                if self.new_highscore_rotation <= -self.new_highscore_rotation_max:
                     self.new_highscore_direction = 'R'
 
             new_highscore_render = pygame.transform.rotate(self.new_highscore_render, self.new_highscore_rotation)

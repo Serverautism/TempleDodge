@@ -168,7 +168,7 @@ class Player:
 
         falling_rock_hit_list = pygame.sprite.spritecollide(self, self.falling_rocks, False, pygame.sprite.collide_mask)
         for entity in falling_rock_hit_list:
-            if self.dy <= 0:
+            if self.rect.y >= entity.rect.y:
                 if not self.godmode:
                     self.hit()
                 else:
