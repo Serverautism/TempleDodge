@@ -29,11 +29,11 @@ class Chest:
 
     def update(self, surface,  all_rocks):
         if not self.crushed:
+            self.rect.bottom = self.rock.rect.top
+
             for entity in all_rocks:
                 if self.rect.colliderect(entity.rect):
                     self.crush()
-
-            self.rect.bottom = self.rock.rect.top
 
             if self.opened:
                 surface.blit(self.open_image, self.rect)

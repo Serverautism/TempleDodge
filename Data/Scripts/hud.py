@@ -19,6 +19,12 @@ class Hud:
         self.last_mana_count = self.player.mana_count
         self.last_gold_count = self.player.gold_count
 
+        self.paused_icon = pygame.image.load('Data/Assets/Sprites/Gui/paused_icon.png').convert_alpha()
+        self.paused_text = 'press ESCAPE again to unpause'
+        self.paused_render = self.render_paused()
+        self.paused_render_x = self.render_width / 2 - self.paused_render.get_width() / 2
+        self.paused_render_y = self.render_height / 2 - self.paused_render.get_height() / 2
+
         self.mana_frame = pygame.image.load('Data/Assets/Sprites/Gui/frame_mana.png').convert_alpha()
         self.mana_frame_rect = self.mana_frame.get_rect()
         self.mana_frame_rect.x, self.mana_frame_rect.y = self.mana_position
@@ -40,7 +46,7 @@ class Hud:
 
         self.render(self.last_mana_count, self.last_gold_count)
 
-    def update(self, surface):
+    def update(self, surface, paused):
         # get the counts
         gold = self.player.gold_count
         mana = self.player.mana_count
@@ -51,6 +57,25 @@ class Hud:
             self.last_gold_count = gold
 
         surface.blit(self.render_surface, (0, 0))
+
+        if paused:
+            self.display_paused(surface)
+
+    def display_paused(self, surface):
+        surface.blit(self.paused_render, (self.paused_render_x, self.paused_render_y))
+
+    def render_paused(self):
+        textrender = self.font.render(self.paused_text, True, colors.grey_3)
+
+        width = textrender.get_width() + self.paused_icon.get_width() + 10
+        height = self.paused_icon.get_height()
+        render_surface = pygame.Surface((width, height))
+        render_surface.set_colorkey((0, 0, 0))
+
+        render_surface.blit(self.paused_icon, (0, 0))
+        render_surface.blit(textrender, (self.paused_icon.get_width() + 10, 5))
+
+        return render_surface
 
     def render(self, mana, gold):
         print('rendered')

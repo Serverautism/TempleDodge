@@ -78,30 +78,31 @@ class Player:
         self.mana_count = 0
         self.max_mana = 7
 
-    def update(self, surface):
-        # move x, check collision
-        self.rect.x += self.dx
-        self.check_collision_x()
+    def update(self, surface, paused):
+        if not paused:
+            # move x, check collision
+            self.rect.x += self.dx
+            self.check_collision_x()
 
-        # move y, check collision
-        if not self.is_ghost:
-            self.calc_grav()
-        self.rect.y += self.dy
-        self.check_collision_y()
+            # move y, check collision
+            if not self.is_ghost:
+                self.calc_grav()
+            self.rect.y += self.dy
+            self.check_collision_y()
 
-        # check bullets
-        self.check_bullets()
+            # check bullets
+            self.check_bullets()
 
-        # check chests and items
-        self.check_chests()
-        self.check_items()
+            # check chests and items
+            self.check_chests()
+            self.check_items()
 
-        # update ghost state
-        if self.is_ghost:
-            self.check_ghost_state()
+            # update ghost state
+            if self.is_ghost:
+                self.check_ghost_state()
 
-        # get image and draw
-        self.get_image()
+            # get image and draw
+            self.get_image()
         surface.blit(self.image, self.rect)
 
     def calc_grav(self):

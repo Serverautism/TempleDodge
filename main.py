@@ -118,20 +118,20 @@ class Game:
             self.screen.fill('black')
             # input
             self.handle_input()
+            # background
+            self.draw_background(self.render_surface)
 
-            if not self.paused:
-                # background
-                self.draw_background(self.render_surface)
-                # entitys in right order
-                self.rock_handler.update(True, self.render_surface)
-                self.update_chests(self.render_surface)
-                self.player.update(self.render_surface)
-                self.update_items(self.render_surface)
-                self.bullet_handler.update(self.render_surface)
-                self.hud.update(self.render_surface)
+            # entitys in right order
+            self.rock_handler.update(True, self.render_surface, self.paused)
+            self.update_chests(self.render_surface)
+            self.player.update(self.render_surface, self.paused)
+            self.update_items(self.render_surface)
+            self.bullet_handler.update(self.render_surface, self.paused)
+            self.hud.update(self.render_surface, self.paused)
 
-                # map shadows
-                self.draw_map_shadows(self.render_surface)
+            # map shadows
+            self.draw_map_shadows(self.render_surface)
+
             # scale image
             self.screen.blit(pygame.transform.scale(self.render_surface, self.screen_dimensions), (0, 0))
             # update screen
@@ -198,7 +198,7 @@ class Game:
             if entity.collected:
                 to_remove.append(entity)
             else:
-                entity.update(surface)
+                entity.update(surface, self.paused)
 
         for entity in to_remove:
             self.items.remove(entity)

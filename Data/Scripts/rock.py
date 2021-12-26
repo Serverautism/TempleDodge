@@ -13,8 +13,8 @@ class Rock:
         self.rect.x = self.x
         self.rect.y = self.y
 
-    def update(self, surface, landed_rocks=None):
-        if not self.landed:
+    def update(self, surface, paused, landed_rocks=None):
+        if not self.landed and not paused:
             self.rect.y += self.speed
             for entity in landed_rocks:
                 if self.rect.colliderect(entity.rect):

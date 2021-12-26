@@ -23,12 +23,15 @@ class Bullet:
             image = pygame.image.load(f'Data/Assets/Sprites/Bullets/Sparkle/sparkle_{i + 1}.png').convert_alpha()
             self.sparkle_frames.append(image)
 
-    def update(self, surface):
-        self.position[0] += self.velocity[0]
-        self.position[1] += self.velocity[1]
-        self.rect.center = self.position
+    def update(self, surface, paused):
+        if not paused:
+            # move
+            self.position[0] += self.velocity[0]
+            self.position[1] += self.velocity[1]
+            self.rect.center = self.position
 
-        self.check_dead()
+            self.check_dead()
+
         if not self.dead:
 
             glow_big, glow_small = self.get_glow()

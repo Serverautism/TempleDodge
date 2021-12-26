@@ -35,18 +35,19 @@ class Item:
         self.rect.center = self.center
         self.mask = pygame.mask.from_surface(self.image)
 
-    def update(self, surface):
+    def update(self, surface, paused):
         # get image
         self.get_image()
 
-        # move left right, check collision
-        self.rect.x += self.velocity[0]
-        self.check_collision_x()
+        if not paused:
+            # move left right, check collision
+            self.rect.x += self.velocity[0]
+            self.check_collision_x()
 
-        # move up down, check collision
-        self.rect.y += self.velocity[1]
-        self.check_collision_y()
-        self.apply_gravity()
+            # move up down, check collision
+            self.rect.y += self.velocity[1]
+            self.check_collision_y()
+            self.apply_gravity()
 
         # blit
         surface.blit(self.image, self.rect)

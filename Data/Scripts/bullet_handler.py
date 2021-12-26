@@ -18,33 +18,35 @@ class BulletHandler:
 
         self.bullets = []
 
-    def update(self, surface):
-        self.time_since_last_bullet += 1
-        self.time_since_last_phase += 1
+    def update(self, surface, paused):
+        if not paused:
+            # spawn bullet or activate phase
+            self.time_since_last_bullet += 1
+            self.time_since_last_phase += 1
 
-        if self.time_since_last_phase / 60 >= self.phase_time:
-            self.time_since_last_phase = 0
-            self.phase = True
+            if self.time_since_last_phase / 60 >= self.phase_time:
+                self.time_since_last_phase = 0
+                self.phase = True
 
-        if not self.phase:
-            if self.time_since_last_bullet >= self.default_bullet_time:
-                self.time_since_last_bullet = 0
-                self.spawn_bullet()
-        else:
-            self.phase_count += 1
-            if self.phase_count / 60 >= self.phase_duration:
-                self.phase = False
+            if not self.phase:
+                if self.time_since_last_bullet >= self.default_bullet_time:
+                    self.time_since_last_bullet = 0
+                    self.spawn_bullet()
+            else:
+                self.phase_count += 1
+                if self.phase_count / 60 >= self.phase_duration:
+                    self.phase = False
 
-            if self.time_since_last_bullet >= self.phase_bullet_time:
-                self.time_since_last_bullet = 0
-                self.spawn_bullet()
+                if self.time_since_last_bullet >= self.phase_bullet_time:
+                    self.time_since_last_bullet = 0
+                    self.spawn_bullet()
 
         to_remove = []
         for entity in self.bullets:
             if entity.dead:
                 to_remove.append(entity)
             else:
-                entity.update(surface)
+                entity.update(surface, paused)
 
         for entity in to_remove:
             self.bullets.remove(entity)
