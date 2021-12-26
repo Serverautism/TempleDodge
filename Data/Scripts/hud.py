@@ -131,7 +131,6 @@ class Hud:
         return render_surface
 
     def render_hud(self, mana, gold):
-        print('rendered')
         self.render_surface.fill((0, 0, 0))
         # draw the frames
         self.render_surface.blit(self.mana_frame, self.mana_frame_rect)

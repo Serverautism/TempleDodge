@@ -17,7 +17,7 @@ class Bullet:
         self.glow_color = (20, 0, 44)
 
         self.big_glow_size = self.rect.width * 2
-        self.small_glow_size = self.rect.width * 1.5
+        self.small_glow_size = self.rect.width
 
         self.glow_grow = True
         self.dead = False
