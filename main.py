@@ -11,7 +11,6 @@ class Game:
 
         # bool
         self.running = True
-        self.round_over = False
         self.paused = False
         self.checked_for_new_highscore = False
         self.new_highscore = False
@@ -162,7 +161,7 @@ class Game:
                 elif event.key == pygame.K_f:
                     self.player.enable_ghost_mode()
                 elif event.key == pygame.K_ESCAPE:
-                    if not self.round_over:
+                    if not self.player.dead:
                         if self.paused:
                             self.paused = False
                         else:
