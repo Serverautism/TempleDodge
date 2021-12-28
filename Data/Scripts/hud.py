@@ -21,7 +21,7 @@ class Hud:
         self.last_gold_count = self.player.gold_count
 
         self.paused_icon = pygame.image.load('Data/Assets/Sprites/Gui/paused_icon.png').convert_alpha()
-        self.paused_text = 'press ESCAPE again to unpause'
+        self.paused_text = 'press ESCAPE to resume'
         self.paused_render = self.render_paused()
         self.paused_render_x = self.render_width / 2 - self.paused_render.get_width() / 2
         self.paused_render_y = self.render_height / 2 - self.paused_render.get_height() / 2
@@ -60,6 +60,19 @@ class Hud:
             image = pygame.image.load(f'Data/Assets/Sprites/Gui/bar_mana_darkblue_{i + 1}.png').convert_alpha()
             self.mana_bar_darkblue_frames.append(image)
 
+        self.text_background_frame = 0
+        self.text_background_change = 0.1
+        self.text_background_count = 0
+        self.text_background_length = 6
+        self.text_background_30_frames = []
+        self.text_background_20_frames = []
+
+        for i in range(self.text_background_length):
+            image = pygame.image.load(f'Data/Assets/Sprites/Gui/gui_background_30_{i + 1}.png').convert_alpha()
+            self.text_background_30_frames.append(image)
+            image = pygame.image.load(f'Data/Assets/Sprites/Gui/gui_background_20_{i + 1}.png').convert_alpha()
+            self.text_background_20_frames.append(image)
+
         self.render_surface = pygame.Surface((self.render_width, self.render_height))
         self.render_surface.set_colorkey((0, 0, 0))
 
@@ -81,6 +94,8 @@ class Hud:
             self.display_paused(surface)
 
     def display_dead(self, surface, new_highscore):
+        self.draw_text_background(surface)
+
         surface.blit(self.score_text_render, (self.score_text_render_x, self.score_text_render_y))
         surface.blit(self.replay_text_render, (self.replay_text_render_x, self.replay_text_render_y))
         surface.blit(self.r_icon, (self.r_icon_x, self.r_icon_y))
@@ -114,7 +129,21 @@ class Hud:
         self.r_icon_x = self.replay_text_render_x - self.r_icon.get_width() - 10
         self.replay_text_render_y = self.r_icon_y + self.r_icon.get_height() / 2 - self.replay_text_render.get_height() / 2
 
+    def draw_text_background(self, surface):
+        self.text_background_count += 1
+        if self.text_background_count / 60 >= self.text_background_change:
+            self.text_background_count = 0
+            self.text_background_frame += 1
+            if self.text_background_frame == self.text_background_length:
+                self.text_background_frame = 0
+
+        surface.blit(self.text_background_30_frames[self.text_background_frame], (-10, 10),
+                     special_flags=pygame.BLEND_RGB_SUB)
+        surface.blit(self.text_background_20_frames[self.text_background_frame], (0, 0))
+
     def display_paused(self, surface):
+        self.draw_text_background(surface)
+
         surface.blit(self.paused_render, (self.paused_render_x, self.paused_render_y))
 
     def render_paused(self):
