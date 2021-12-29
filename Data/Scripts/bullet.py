@@ -1,4 +1,5 @@
 import pygame
+import math
 
 
 class Bullet:
@@ -14,6 +15,10 @@ class Bullet:
         self.frame_change = .1
         self.frame_count = 0
 
+        radians = math.atan2(*velocity)
+        self.angle = math.degrees(radians)
+        self.angle -= 90
+
         self.glow_color = (20, 0, 44)
 
         self.big_glow_size = self.rect.width * 2
@@ -28,23 +33,23 @@ class Bullet:
             image = pygame.image.load(f'Data/Assets/Sprites/Bullets/Sparkle/sparkle_{i + 1}.png').convert_alpha()
 
             if self.wall == 2:
-                self.sparkle_frames.append(image)
+                self.sparkle_frames.append(pygame.transform.rotate(image, self.angle + 180))
             elif self.wall == 1:
-                self.sparkle_frames.append(pygame.transform.rotate(image, 90))
+                self.sparkle_frames.append(pygame.transform.rotate(image, self.angle + 180))
             else:
-                self.sparkle_frames.append(pygame.transform.flip(image, True, False))
+                self.sparkle_frames.append(pygame.transform.rotate(image, self.angle + 180))
 
         self.sparkle_image = self.sparkle_frames[0]
 
         if self.wall == 0:
-            self.render_x = position[0]
-            self.render_y = position[1] - self.sparkle_image.get_height() / 2
+            self.render_x = int(position[0] - abs(self.angle) / 2)
+            self.render_y = int(position[1] - self.sparkle_image.get_height() / 2)
         elif self.wall == 1:
-            self.render_x = position[0] - self.sparkle_image.get_width() / 2
-            self.render_y = position[1]
+            self.render_x = int(position[0] - self.sparkle_image.get_width() / 2)
+            self.render_y = int(position[1] - abs(self.angle) / 2)
         else:
-            self.render_x = position[0] - self.sparkle_image.get_width()
-            self.render_y = position[1] - self.sparkle_image.get_height() / 2
+            self.render_x = int(position[0] - self.sparkle_image.get_width() * .75)
+            self.render_y = int(position[1] - self.sparkle_image.get_height() / 2)
 
     def update(self, surface, paused):
         if not paused:
