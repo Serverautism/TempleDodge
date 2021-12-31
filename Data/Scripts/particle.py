@@ -2,24 +2,26 @@ import pygame
 
 
 class Particle:
-    def __init__(self, center, velocity, radius, lifetime, color, static_size=False, has_glow=False, rocks=None,
+    def __init__(self, center, velocity, radius, lifetime, color, glow_color, static_size=False, has_glow=False, rocks=None,
                  gravity=0, glow_scale=5):
         self.center = center
         self.velocity = velocity
         self.radius = radius
-        self.lifetime = lifetime
+        self.lifetime = lifetime * 60
         self.color = color
-        self.glow_color = self.get_glow_color()
+        self.glow_color = glow_color
         self.static_size = static_size
         self.has_glow = has_glow
         self.rock = rocks
         self.gravity = gravity
         self.glow_scale = glow_scale
 
+        self.dead = False
+
         if self.static_size and self.has_glow:
             self.glow_image = self.get_glow()
         elif not self.static_size:
-            self.radius_change = self.radius / self.lifetime
+            self.radius_change = .1
 
     def update(self, surface):
         # change position
@@ -34,6 +36,13 @@ class Particle:
         # change radius
         if not self.static_size:
             self.radius -= self.radius_change
+            if self.radius <= 0:
+                self.dead = True
+                return
+        else:
+            self.lifetime -= 1
+            if self.lifetime <= 0:
+                self.dead = True
 
         # draw glow
         if self.static_size:
