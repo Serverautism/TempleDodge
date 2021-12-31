@@ -75,8 +75,14 @@ class Player:
         self.items = items
         self.bullets = bullets
 
+        self.glow_color = (0, 8, 11)
+        self.ghost_rect_width = self.ghost_frames_left[0].get_width()
+        self.big_glow_size = self.ghost_rect_width * 2
+        self.small_glow_size = self.ghost_rect_width
+        self.glow_grow = True
+
         self.gold_count = 0
-        self.mana_count = 0
+        self.mana_count = 7
         self.max_mana = 7
 
     def update(self, surface, paused):
@@ -102,6 +108,10 @@ class Player:
                 # update ghost state
                 if self.is_ghost:
                     self.check_ghost_state()
+                    glow_big, glow_small = self.get_glow()
+
+                    surface.blit(glow_big, (self.rect.center[0] - self.big_glow_size, self.rect.center[1] - self.big_glow_size), special_flags=pygame.BLEND_RGB_ADD)
+                    surface.blit(glow_small, (self.rect.center[0] - self.small_glow_size, self.rect.center[1] - self.small_glow_size), special_flags=pygame.BLEND_RGB_ADD)
 
                 # get image and draw
                 self.get_image()
@@ -342,6 +352,30 @@ class Player:
         self.rect = self.image.get_rect()
         self.rect.center = before_rect.center
         self.mask = pygame.mask.from_surface(self.image)
+
+    def get_glow(self):
+        if self.glow_grow:
+            if self.big_glow_size >= self.ghost_rect_width * 3:
+                self.glow_grow = False
+
+            self.big_glow_size += 1
+            self.small_glow_size += 1
+        else:
+            if self.big_glow_size <= self.ghost_rect_width * 2:
+                self.glow_grow = True
+
+            self.big_glow_size -= 1
+            self.small_glow_size -= 1
+
+        big_glow_surface = pygame.Surface((self.big_glow_size * 2, self.big_glow_size * 2))
+        big_glow_surface.set_colorkey((0, 0, 0))
+        small_glow_surface = pygame.Surface((self.small_glow_size * 2, self.small_glow_size * 2))
+        small_glow_surface.set_colorkey((0, 0, 0))
+
+        pygame.draw.circle(big_glow_surface, self.glow_color, (self.big_glow_size, self.big_glow_size), self.big_glow_size)
+        pygame.draw.circle(small_glow_surface, self.glow_color, (self.small_glow_size, self.small_glow_size), self.small_glow_size)
+
+        return big_glow_surface, small_glow_surface
 
     def reset(self, center):
         self.dead = False
