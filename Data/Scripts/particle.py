@@ -45,10 +45,11 @@ class Particle:
                 self.dead = True
 
         # draw glow
-        if self.static_size:
-            surface.blit(self.glow_image, (int(self.center[0]) - int(self.radius * self.glow_scale), int(self.center[1]) - int(self.radius * self.glow_scale)), special_flags=pygame.BLEND_RGB_ADD)
-        else:
-            surface.blit(self.get_glow(), (int(self.center[0]) - int(self.radius * self.glow_scale), int(self.center[1]) - int(self.radius * self.glow_scale)), special_flags=pygame.BLEND_RGB_ADD)
+        if self.has_glow:
+            if self.static_size:
+                surface.blit(self.glow_image, (int(self.center[0]) - int(self.radius * self.glow_scale), int(self.center[1]) - int(self.radius * self.glow_scale)), special_flags=pygame.BLEND_RGB_ADD)
+            else:
+                surface.blit(self.get_glow(), (int(self.center[0]) - int(self.radius * self.glow_scale), int(self.center[1]) - int(self.radius * self.glow_scale)), special_flags=pygame.BLEND_RGB_ADD)
 
         # draw particle
         pygame.draw.circle(surface, self.color, [int(self.center[0]), int(self.center[1])], int(self.radius))

@@ -48,12 +48,20 @@ class Rock:
             center_2 = list(self.rect.topright)
             velocity_1 = [randint(0, 10) / 10 - .5, 0]
             velocity_2 = [randint(0, 10) / 10 - .5, 0]
-            radius_1 = randint(1, 2)
-            radius_2 = randint(1, 2)
-            lifetime = 2
+            radius_1 = 1
+            radius_2 = 1
+            lifetime = 1
 
-            self.particles.append(particle.Particle(center_1, velocity_1, radius_1, lifetime, self.particle_color, self.particle_glow_color))
-            self.particles.append(particle.Particle(center_2, velocity_2, radius_2, lifetime, self.particle_color, self.particle_glow_color))
+            self.particles.append(particle.Particle(center_1, velocity_1, radius_1, lifetime, self.particle_color, self.particle_glow_color, static_size=True, has_glow=True))
+            self.particles.append(particle.Particle(center_2, velocity_2, radius_2, lifetime, self.particle_color, self.particle_glow_color, static_size=True, has_glow=True))
 
+        to_remove = []
         for entity in self.particles:
-            entity.update(surface)
+            if entity.dead:
+                to_remove.append(entity)
+            else:
+                entity.update(surface)
+
+        for entity in to_remove:
+            self.particles.remove(entity)
+
