@@ -3,6 +3,7 @@ from random import randint
 
 
 from . import particle
+from . import funcs
 
 
 class Rock:
@@ -32,28 +33,27 @@ class Rock:
                     self.rect.bottom = entity.rect.top
                     self.landed = True
 
-            self.handle_particles(surface)
-
         surface.blit(self.image, self.rect)
 
     def move_down(self, pixels):
         self.rect.y += pixels
 
-    def handle_particles(self, surface):
-        self.particle_count += 1
-        if self.particle_count == self.particle_time:
-            self.particle_count = 0
+    def update_particles(self, surface):
+        if not self.landed:
+            self.particle_count += 1
+            if self.particle_count == self.particle_time:
+                self.particle_count = 0
 
-            center_1 = list(self.rect.topleft)
-            center_2 = list(self.rect.topright)
-            velocity_1 = [randint(0, 10) / 10 - .5, 0]
-            velocity_2 = [randint(0, 10) / 10 - .5, 0]
-            radius_1 = 1
-            radius_2 = 1
-            lifetime = 1
+                center_1 = list(funcs.render_pos_to_screen_pos(self.rect.topleft, (1920, 1080)))
+                center_2 = list(funcs.render_pos_to_screen_pos(self.rect.topright, (1920, 1080)))
+                velocity_1 = [randint(0, 10) / 10 - .5, 0]
+                velocity_2 = [randint(0, 10) / 10 - .5, 0]
+                radius_1 = randint(1, 3)
+                radius_2 = randint(1, 3)
+                lifetime = 1
 
-            self.particles.append(particle.Particle(center_1, velocity_1, radius_1, lifetime, self.particle_color, self.particle_glow_color, static_size=True, has_glow=True))
-            self.particles.append(particle.Particle(center_2, velocity_2, radius_2, lifetime, self.particle_color, self.particle_glow_color, static_size=True, has_glow=True))
+                self.particles.append(particle.Particle(center_1, velocity_1, radius_1, lifetime, self.particle_color, self.particle_glow_color, has_glow=True))
+                self.particles.append(particle.Particle(center_2, velocity_2, radius_2, lifetime, self.particle_color, self.particle_glow_color, has_glow=True))
 
         to_remove = []
         for entity in self.particles:

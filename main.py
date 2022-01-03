@@ -73,7 +73,7 @@ class Game:
         self.clock = pygame.time.Clock()
         self.render_surface = pygame.Surface(self.render_dimensions).convert_alpha()
         self.render_surface.set_colorkey(colors.black)
-        self.rock_handler = rock_handler.RockHandler(10, 0)
+        self.rock_handler = rock_handler.RockHandler(5, 0)
         self.bullet_handler = bullet_handler.BulletHandler(1, 5, 20, 10)
         self.player = player.Player(self.player_spawn, self.rock_handler.landed_rocks, self.rock_handler.falling_rocks, self.rock_handler.chests, self.items, self.bullet_handler.bullets)
         self.hud = hud.Hud(self.player)
@@ -121,6 +121,7 @@ class Game:
     def run(self):
         while self.running:
             self.clock.tick(60)
+            print(self.clock.get_fps())
             self.screen.fill('black')
             # input
             self.handle_input()
@@ -146,6 +147,11 @@ class Game:
 
             # scale image
             self.screen.blit(pygame.transform.scale(self.render_surface, self.screen_dimensions), (0, 0))
+
+            # particles on screen
+            self.rock_handler.update_particles(self.screen)
+            self.player.update_particles(self.screen)
+
             # update screen
             pygame.display.update()
 

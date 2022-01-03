@@ -21,7 +21,7 @@ class Particle:
         if self.static_size and self.has_glow:
             self.glow_image = self.get_glow()
         elif not self.static_size:
-            self.radius_change = .1
+            self.radius_change = self.radius / self.lifetime
 
     def update(self, surface):
         # change position

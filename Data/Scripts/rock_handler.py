@@ -104,6 +104,10 @@ class RockHandler:
                     for i in range(len(self.row_counter)):
                         self.row_counter[i] -= 1
 
+    def update_particles(self, surface):
+        for entity in self.falling_rocks + self.landed_rocks:
+            entity.update_particles(surface)
+
     def generate_landed_rocks(self):
         for i in range(1, 31):
             x, y = funcs.grid_pos_to_render_pos((i, 17))

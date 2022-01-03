@@ -1,4 +1,9 @@
 import pygame
+from random import randint
+
+
+from . import particle
+from . import funcs
 
 
 def load_frames(path, length):
@@ -55,7 +60,7 @@ class Player:
         self.ghost_frames_length = 1
 
         self.frame = 0
-        self.frame_change = 0.2
+        self.frame_change = 0.1
         self.frame_count = 0
 
         self.idle_frames_left, self.idle_frames_right = load_frames('Data/Assets/Sprites/Player/Idle/player_idle_', self.idle_frames_length)
@@ -84,6 +89,17 @@ class Player:
         self.gold_count = 0
         self.mana_count = 7
         self.max_mana = 7
+
+        self.particles = []
+
+        self.jump_particle_ammount = 20
+        self.jump_particle_color = (224, 192, 95)
+        self.jump_particle_glow_color = (28, 21, 0)
+
+        self.move_particle_time = 10
+        self.move_particle_count = 0
+        self.move_particle_color = (206, 206, 206)
+        self.move_particle_glow_color = (10, 10, 10)
 
     def update(self, surface, paused):
         if not self.dead:
@@ -285,12 +301,14 @@ class Player:
                 self.state = 'jump'
                 self.jump_rotation = 0
                 self.jump_spin_done = False
+                self.add_jump_particles()
         else:
             self.jump_count -= 1
             self.dy = -self.jump_vel
             self.state = 'jump'
             self.jump_rotation = 0
             self.jump_spin_done = False
+            self.add_jump_particles()
 
     def hit(self):
         self.dead = True
@@ -376,6 +394,42 @@ class Player:
         pygame.draw.circle(small_glow_surface, self.glow_color, (self.small_glow_size, self.small_glow_size), self.small_glow_size)
 
         return big_glow_surface, small_glow_surface
+
+    def add_jump_particles(self):
+        for i in range(self.jump_particle_ammount):
+            center = list(funcs.render_pos_to_screen_pos([self.rect.x + (self.rect.width / self.jump_particle_ammount) * i, self.rect.bottom], (1920, 1080)))
+            velocity = [randint(1, 10) / 10 - .5, randint(1, 10) / 10 - .5]
+            radius = randint(1, 3)
+            lifetime = 1
+
+            p = particle.Particle(center, velocity, radius, lifetime, self.jump_particle_color, self.jump_particle_glow_color, has_glow=True)
+            self.particles.append(p)
+
+    def update_particles(self, surface):
+        # spawn particle
+        if self.dx != 0 or self.dy != 0:
+            self.move_particle_count += 1
+            if self.move_particle_count == self.move_particle_time:
+                self.move_particle_count = 0
+
+                center = list(funcs.render_pos_to_screen_pos(self.rect.center, (1920, 1080)))
+                velocity = [randint(1, 10) / 10 - .5, randint(1, 10) / 10 - .5]
+                radius = randint(1, 3)
+                lifetime = 2
+
+                p = particle.Particle(center, velocity, radius, lifetime, self.move_particle_color, self.move_particle_glow_color, has_glow=True)
+                self.particles.append(p)
+
+        # update_particles
+        to_remove = []
+        for entity in self.particles:
+            if entity.dead:
+                to_remove.append(entity)
+            else:
+                entity.update(surface)
+
+        for entity in to_remove:
+            self.particles.remove(entity)
 
     def reset(self, center):
         self.dead = False
