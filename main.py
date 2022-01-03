@@ -121,7 +121,7 @@ class Game:
     def run(self):
         while self.running:
             self.clock.tick(60)
-            print(self.clock.get_fps())
+            #print(self.clock.get_fps())
             self.screen.fill('black')
             # input
             self.handle_input()
@@ -150,7 +150,8 @@ class Game:
 
             # particles on screen
             self.rock_handler.update_particles(self.screen)
-            self.player.update_particles(self.screen)
+            if not self.player.dead:
+                self.player.update_particles(self.screen)
 
             # update screen
             pygame.display.update()

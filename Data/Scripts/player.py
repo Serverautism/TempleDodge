@@ -447,3 +447,4 @@ class Player:
         self.ghost_count = 0
         self.frame = 0
         self.frame_count = 0
+        self.particles.clear()
