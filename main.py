@@ -84,13 +84,21 @@ class Game:
         # images
         self.background_rect_image = pygame.image.load("Data/Assets/Sprites/Background/rect.png").convert_alpha()
 
-        self.map_shadow_image_lr_20_0 = pygame.image.load("Data/Assets/Sprites/Map/wallshadow_lr_20_1.png").convert_alpha()
-        self.map_shadow_image_lr_20_1 = pygame.image.load("Data/Assets/Sprites/Map/wallshadow_lr_20_2.png").convert_alpha()
-        self.map_shadow_image_lr_20_2 = pygame.image.load("Data/Assets/Sprites/Map/wallshadow_lr_20_3.png").convert_alpha()
+        self.map_shadow_image_l_20_0 = pygame.image.load("Data/Assets/Sprites/Map/wallshadow_l_20_1.png").convert_alpha()
+        self.map_shadow_image_l_20_1 = pygame.image.load("Data/Assets/Sprites/Map/wallshadow_l_20_2.png").convert_alpha()
+        self.map_shadow_image_l_20_2 = pygame.image.load("Data/Assets/Sprites/Map/wallshadow_l_20_3.png").convert_alpha()
 
-        self.map_shadow_image_lr_60_0 = pygame.image.load("Data/Assets/Sprites/Map/wallshadow_lr_60_1.png").convert_alpha()
-        self.map_shadow_image_lr_60_1 = pygame.image.load("Data/Assets/Sprites/Map/wallshadow_lr_60_2.png").convert_alpha()
-        self.map_shadow_image_lr_60_2 = pygame.image.load("Data/Assets/Sprites/Map/wallshadow_lr_60_3.png").convert_alpha()
+        self.map_shadow_image_r_20_0 = pygame.image.load("Data/Assets/Sprites/Map/wallshadow_r_20_1.png").convert_alpha()
+        self.map_shadow_image_r_20_1 = pygame.image.load("Data/Assets/Sprites/Map/wallshadow_r_20_2.png").convert_alpha()
+        self.map_shadow_image_r_20_2 = pygame.image.load("Data/Assets/Sprites/Map/wallshadow_r_20_3.png").convert_alpha()
+
+        self.map_shadow_image_l_60_0 = pygame.image.load("Data/Assets/Sprites/Map/wallshadow_l_60_1.png").convert_alpha()
+        self.map_shadow_image_l_60_1 = pygame.image.load("Data/Assets/Sprites/Map/wallshadow_l_60_2.png").convert_alpha()
+        self.map_shadow_image_l_60_2 = pygame.image.load("Data/Assets/Sprites/Map/wallshadow_l_60_3.png").convert_alpha()
+
+        self.map_shadow_image_r_60_0 = pygame.image.load("Data/Assets/Sprites/Map/wallshadow_r_60_1.png").convert_alpha()
+        self.map_shadow_image_r_60_1 = pygame.image.load("Data/Assets/Sprites/Map/wallshadow_r_60_2.png").convert_alpha()
+        self.map_shadow_image_r_60_2 = pygame.image.load("Data/Assets/Sprites/Map/wallshadow_r_60_3.png").convert_alpha()
 
         self.map_shadow_image_b_20_0 = pygame.image.load("Data/Assets/Sprites/Map/wallshadow_b_20_1.png").convert_alpha()
         self.map_shadow_image_b_20_1 = pygame.image.load("Data/Assets/Sprites/Map/wallshadow_b_20_2.png").convert_alpha()
@@ -113,7 +121,8 @@ class Game:
         # dependent setups
         self.background_lines = self.make_background_lines()
         self.background_rects = self.make_background_rects()
-        self.map_shadow_lr_ys = [0, -self.map_shadow_image_lr_20_0.get_height()]
+        self.map_shadow_lr_ys = [0, -self.map_shadow_image_l_20_0.get_height()]
+        self.map_shadow_lr_xs = [0, self.render_width - self.map_shadow_image_l_20_0.get_width()]
         self.map_shadow_b_xs = [0, self.map_shadow_image_b_20_0.get_width()]
         self.map_shadow_t_xs = [0, -self.map_shadow_image_t_20_0.get_width()]
         self.map_shadow_b_y = self.render_height - self.map_shadow_image_b_20_0.get_height()
@@ -121,8 +130,7 @@ class Game:
     def run(self):
         while self.running:
             self.clock.tick(60)
-            #print(self.clock.get_fps())
-            self.screen.fill('black')
+            print(self.clock.get_fps())
             # input
             self.handle_input()
             # background
@@ -231,7 +239,7 @@ class Game:
 
         # rects
         for rect in self.background_rects:
-            render = pygame.transform.rotate(rect[0], rect[3]).convert_alpha()
+            render = pygame.transform.rotate(rect[0], rect[3])
 
             rect[1][1] += self.background_rects_speed
             if rect[3] > 0:
@@ -283,9 +291,9 @@ class Game:
         self.map_shadow_lr_ys[1] += self.map_shadow_speed
 
         if self.map_shadow_lr_ys[0] > self.render_height:
-            self.map_shadow_lr_ys[0] -= self.map_shadow_image_lr_20_0.get_height() * 2
+            self.map_shadow_lr_ys[0] -= self.map_shadow_image_l_20_0.get_height() * 2
         elif self.map_shadow_lr_ys[1] > self.render_height:
-            self.map_shadow_lr_ys[1] -= self.map_shadow_image_lr_20_0.get_height() * 2
+            self.map_shadow_lr_ys[1] -= self.map_shadow_image_l_20_0.get_height() * 2
 
         if self.map_shadow_lr_60_count / 60 >= self.map_shadow_change_speed:
             self.map_shadow_lr_60_count = 0
@@ -303,27 +311,33 @@ class Game:
 
         for y in self.map_shadow_lr_ys:
             if self.map_shadow_lr_60_frame == 0:
-                surface.blit(self.map_shadow_image_lr_60_0, (0, y), special_flags=pygame.BLEND_RGB_SUB)
+                surface.blit(self.map_shadow_image_l_60_0, (self.map_shadow_lr_xs[0], y), special_flags=pygame.BLEND_RGB_SUB)
+                surface.blit(self.map_shadow_image_r_60_0, (self.map_shadow_lr_xs[1], y), special_flags=pygame.BLEND_RGB_SUB)
             elif self.map_shadow_lr_60_frame == 1:
-                surface.blit(self.map_shadow_image_lr_60_1, (0, y), special_flags=pygame.BLEND_RGB_SUB)
+                surface.blit(self.map_shadow_image_l_60_1, (self.map_shadow_lr_xs[0], y), special_flags=pygame.BLEND_RGB_SUB)
+                surface.blit(self.map_shadow_image_r_60_1, (self.map_shadow_lr_xs[1], y), special_flags=pygame.BLEND_RGB_SUB)
             else:
-                surface.blit(self.map_shadow_image_lr_60_2, (0, y), special_flags=pygame.BLEND_RGB_SUB)
+                surface.blit(self.map_shadow_image_l_60_2, (self.map_shadow_lr_xs[0], y), special_flags=pygame.BLEND_RGB_SUB)
+                surface.blit(self.map_shadow_image_r_60_2, (self.map_shadow_lr_xs[1], y), special_flags=pygame.BLEND_RGB_SUB)
 
             if self.map_shadow_lr_20_frame == 0:
-                surface.blit(self.map_shadow_image_lr_20_0, (0, y))
+                surface.blit(self.map_shadow_image_l_20_0, (self.map_shadow_lr_xs[0], y))
+                surface.blit(self.map_shadow_image_r_20_0, (self.map_shadow_lr_xs[1], y))
             elif self.map_shadow_lr_20_frame == 1:
-                surface.blit(self.map_shadow_image_lr_20_1, (0, y))
+                surface.blit(self.map_shadow_image_l_20_1, (self.map_shadow_lr_xs[0], y))
+                surface.blit(self.map_shadow_image_r_20_1, (self.map_shadow_lr_xs[1], y))
             else:
-                surface.blit(self.map_shadow_image_lr_20_2, (0, y))
+                surface.blit(self.map_shadow_image_l_20_2, (self.map_shadow_lr_xs[0], y))
+                surface.blit(self.map_shadow_image_r_20_2, (self.map_shadow_lr_xs[1], y))
 
         # top
         self.map_shadow_t_xs[0] += self.map_shadow_speed
         self.map_shadow_t_xs[1] += self.map_shadow_speed
 
         if self.map_shadow_t_xs[0] > self.render_width:
-            self.map_shadow_t_xs[0] -= self.map_shadow_image_t_20_0.get_width() * 2
+            self.map_shadow_t_xs[0] -= 512 * 2
         elif self.map_shadow_t_xs[1] > self.render_width:
-            self.map_shadow_t_xs[1] -= self.map_shadow_image_t_20_0.get_width() * 2
+            self.map_shadow_t_xs[1] -= 512 * 2
 
         if self.map_shadow_t_60_count / 60 >= self.map_shadow_change_speed:
             self.map_shadow_t_60_count = 0
@@ -358,10 +372,10 @@ class Game:
         self.map_shadow_b_xs[0] -= self.map_shadow_speed
         self.map_shadow_b_xs[1] -= self.map_shadow_speed
 
-        if self.map_shadow_b_xs[0] + self.map_shadow_image_b_20_0.get_width() < 0:
-            self.map_shadow_b_xs[0] += self.map_shadow_image_b_20_0.get_width() * 2
-        elif self.map_shadow_b_xs[1] + self.map_shadow_image_b_20_0.get_width() < 0:
-            self.map_shadow_b_xs[1] += self.map_shadow_image_b_20_0.get_width() * 2
+        if self.map_shadow_b_xs[0] + 512 < 0:
+            self.map_shadow_b_xs[0] += 512 * 2
+        elif self.map_shadow_b_xs[1] + 512 < 0:
+            self.map_shadow_b_xs[1] += 512 * 2
 
         if self.map_shadow_b_60_count / 60 >= self.map_shadow_change_speed:
             self.map_shadow_b_60_count = 0
