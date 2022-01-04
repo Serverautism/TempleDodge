@@ -130,7 +130,7 @@ class Game:
     def run(self):
         while self.running:
             self.clock.tick(60)
-            print(self.clock.get_fps())
+            #print(self.clock.get_fps())
             # input
             self.handle_input()
             # background
