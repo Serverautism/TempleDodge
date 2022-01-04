@@ -45,19 +45,50 @@ class RockHandler:
 
         self.map_of_landed_rocks = copy.deepcopy(self.landed_map_default)
         self.row_counter = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        self.available_rows = list(range(1, 31))
+        self.blocked_rows = []
+        self.row_block_time = 16 / self.rock_speed
 
         self.generate_landed_rocks()
 
     def update(self, spawn_rocks, surface, paused):
+        # unblock blocked collums
+        to_remove = []
+        for row in self.blocked_rows:
+            row[1] -= 1
+            if row[1] == 0:
+                self.available_rows.append(row[0])
+                to_remove.append(row)
+
+        for row in to_remove:
+            self.blocked_rows.remove(row)
+
         # spawn rocks
         if not paused:
             self.time_since_last_spawn += 1
             if spawn_rocks and self.time_since_last_spawn >= self.spawn_time:
                 rows_min_index = self.row_counter.index(min(self.row_counter))
                 self.time_since_last_spawn = 0
-                x = random.randint(1, 30)
-                if self.row_counter[x - 1] > min(self.row_counter) + self.max_collum_difference:
-                    x = rows_min_index + 1
+
+                # choose a spawn
+                x = random.choice(self.available_rows)
+
+                # block rows that are to high
+                to_remove = []
+                for index in self.available_rows:
+                    if self.row_counter[index - 1] > min(self.row_counter) + self.max_collum_difference:
+                        to_remove.append(index)
+                        if index == x:
+                            x = rows_min_index + 1
+
+                for index in to_remove:
+                    self.available_rows.remove(index)
+                    self.blocked_rows.append([index, self.row_block_time])
+
+                # choose a row
+                self.available_rows.remove(x)
+                self.blocked_rows.append([x, self.row_block_time])
+
                 self.row_counter[x - 1] += 1
                 pos = funcs.grid_pos_to_render_pos((x, -1))
                 new_rock = rock.Rock(pos, self.rock_speed, False)

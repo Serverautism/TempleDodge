@@ -47,7 +47,7 @@ class Player:
         self.ghost_speed = 2
         self.ghost_duration_time = 10
         self.ghost_count = 0
-        self.godmode = False
+        self.godmode = True
         self.dead = False
 
         self.left_border_rect = pygame.rect.Rect(0, 0, 16, 288)
@@ -195,11 +195,8 @@ class Player:
         falling_rock_hit_list = pygame.sprite.spritecollide(self, self.falling_rocks, False, pygame.sprite.collide_mask)
         for entity in falling_rock_hit_list:
             if self.rect.y >= entity.rect.y:
-                if not self.godmode:
-                    self.hit()
-                else:
-                    # print('dead')
-                    pass
+                self.hit()
+
             else:
                 self.rect.bottom = entity.rect.top
                 self.dy = 0
@@ -212,11 +209,7 @@ class Player:
     def check_bullets(self):
         bullet_hit_list = pygame.sprite.spritecollide(self, self.bullets, False, pygame.sprite.collide_mask)
         if len(bullet_hit_list) > 0:
-            if not self.godmode:
-                self.hit()
-            else:
-                print('hit bullet')
-                pass
+            self.hit()
 
     def check_chests(self):
         for chest in self.chests:
@@ -226,12 +219,13 @@ class Player:
     def check_items(self):
         item_hit_list = pygame.sprite.spritecollide(self, self.items, False, pygame.sprite.collide_mask)
         for entity in item_hit_list:
-            entity.collect()
-            if entity.name == 'gold':
-                self.gold_count += 1
-            elif entity.name == 'mana':
-                if self.mana_count < self.max_mana:
-                    self.mana_count += 1
+            if entity.collectable:
+                entity.collect()
+                if entity.name == 'gold':
+                    self.gold_count += 1
+                elif entity.name == 'mana':
+                    if self.mana_count < self.max_mana:
+                        self.mana_count += 1
 
     def check_ghost_state(self):
         self.ghost_count += 1
@@ -287,31 +281,33 @@ class Player:
             self.dy = 0
 
     def jump(self):
-        if self.jump_count == 0:
-            # check if player is on the ground
-            self.rect.y += 2
-            landed_rock_hit_list = pygame.sprite.spritecollide(self, self.landed_rocks, False, pygame.sprite.collide_mask)
-            falling_rock_hit_list = pygame.sprite.spritecollide(self, self.falling_rocks, False, pygame.sprite.collide_mask)
-            self.rect.y -= 2
+        if not self.is_ghost:
+            if self.jump_count == 0:
+                # check if player is on the ground
+                self.rect.y += 2
+                landed_rock_hit_list = pygame.sprite.spritecollide(self, self.landed_rocks, False, pygame.sprite.collide_mask)
+                falling_rock_hit_list = pygame.sprite.spritecollide(self, self.falling_rocks, False, pygame.sprite.collide_mask)
+                self.rect.y -= 2
 
-            if len(landed_rock_hit_list) > 0 or len(falling_rock_hit_list) > 0:
-                self.jump_count = self.max_jumps
+                if len(landed_rock_hit_list) > 0 or len(falling_rock_hit_list) > 0:
+                    self.jump_count = self.max_jumps
+                    self.jump_count -= 1
+                    self.dy = -self.jump_vel
+                    self.state = 'jump'
+                    self.jump_rotation = 0
+                    self.jump_spin_done = False
+                    self.add_jump_particles()
+            else:
                 self.jump_count -= 1
                 self.dy = -self.jump_vel
                 self.state = 'jump'
                 self.jump_rotation = 0
                 self.jump_spin_done = False
                 self.add_jump_particles()
-        else:
-            self.jump_count -= 1
-            self.dy = -self.jump_vel
-            self.state = 'jump'
-            self.jump_rotation = 0
-            self.jump_spin_done = False
-            self.add_jump_particles()
 
     def hit(self):
-        self.dead = True
+        if not self.godmode:
+            self.dead = True
 
     def get_image(self):
         before_rect = self.rect.copy()

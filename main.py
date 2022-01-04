@@ -160,6 +160,7 @@ class Game:
             self.rock_handler.update_particles(self.screen)
             if not self.player.dead:
                 self.player.update_particles(self.screen)
+            self.update_item_particles(self.screen)
 
             # update screen
             pygame.display.update()
@@ -232,6 +233,10 @@ class Game:
 
         for entity in to_remove:
             self.items.remove(entity)
+
+    def update_item_particles(self, surface):
+        for entity in self.items:
+            entity.update_particles(surface)
 
     def draw_background(self, surface):
         # base color
