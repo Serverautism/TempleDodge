@@ -83,6 +83,10 @@ class BulletHandler:
 
         self.bullets.append(bullet.Bullet(velocity, position, wall_number))
 
+    def update_particles(self, surface):
+        for entity in self.bullets:
+            entity.update_particles(surface)
+
     def reset(self):
         self.time_since_last_phase = 0
         self.time_since_last_bullet = 0

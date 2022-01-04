@@ -23,7 +23,7 @@ class Rock:
         self.particle_time = 10
         self.particle_count = 0
         self.particle_color = (226, 156, 255)
-        self.particle_glow_color = (11, 0, 16)
+        self.particle_glow_color = (6, 0, 8)
 
     def update(self, surface, paused, landed_rocks=None):
         if not self.landed and not paused:
@@ -46,8 +46,8 @@ class Rock:
 
                 center_1 = list(funcs.render_pos_to_screen_pos(self.rect.topleft, (1920, 1080)))
                 center_2 = list(funcs.render_pos_to_screen_pos(self.rect.topright, (1920, 1080)))
-                velocity_1 = [randint(0, 10) / 10 - .5, 0]
-                velocity_2 = [randint(0, 10) / 10 - .5, 0]
+                velocity_1 = [randint(-5, 5) / 10, randint(0, 10) / 10 - .5]
+                velocity_2 = [randint(-5, 5) / 10, randint(0, 10) / 10 - .5]
                 radius_1 = randint(1, 3)
                 radius_2 = randint(1, 3)
                 lifetime = 1

@@ -34,12 +34,12 @@ class Item:
             self.frames_len = 15
             path = 'Data/Assets/Sprites/Items/Mana/mana_'
             self.move_particle_color = (129, 212, 250)
-            self.move_particle_glow_color = (0, 16, 23)
+            self.move_particle_glow_color = (0, 8, 11)
         elif self.name == 'gold':
             self.frames_len = 15
             path = 'Data/Assets/Sprites/Items/Gold/gold_'
             self.move_particle_color = (224, 192, 95)
-            self.move_particle_glow_color = (28, 21, 0)
+            self.move_particle_glow_color = (14, 10, 0)
 
         self.frames = []
         for i in range(self.frames_len):
@@ -146,7 +146,7 @@ class Item:
             center = list(funcs.render_pos_to_screen_pos(self.rect.center, (1920, 1080)))
             velocity = [randint(1, 10) / 10 - .5, randint(1, 10) / 10 - .5]
             radius = randint(1, 3)
-            lifetime = 2
+            lifetime = 1
 
             p = particle.Particle(center, velocity, radius, lifetime, self.move_particle_color, self.move_particle_glow_color, has_glow=True)
             self.particles.append(p)

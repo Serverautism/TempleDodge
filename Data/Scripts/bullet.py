@@ -1,5 +1,10 @@
 import pygame
 import math
+from random import randint
+
+
+from . import particle
+from . import funcs
 
 
 class Bullet:
@@ -50,6 +55,13 @@ class Bullet:
         else:
             self.render_x = int(position[0] - self.sparkle_image.get_width() * .75)
             self.render_y = int(position[1] - self.sparkle_image.get_height() / 2)
+
+        self.particles = []
+
+        self.move_particle_time = 5
+        self.move_particle_count = 0
+        self.move_particle_color = (131, 31, 255)
+        self.move_particle_glow_color = (5, 0, 11)
 
     def update(self, surface, paused):
         if not paused:
@@ -118,4 +130,29 @@ class Bullet:
             self.sparkle_image = self.sparkle_frames[self.frame]
 
         surface.blit(self.sparkle_image, (self.render_x, self.render_y))
+
+    def update_particles(self, surface):
+        # spawn particle
+        self.move_particle_count += 1
+        if self.move_particle_count == self.move_particle_time:
+            self.move_particle_count = 0
+
+            center = list(funcs.render_pos_to_screen_pos(self.rect.center, (1920, 1080)))
+            velocity = [randint(1, 20) / 10 - 1, randint(1, 20) / 10 - 1]
+            radius = randint(1, 3)
+            lifetime = 2
+
+            p = particle.Particle(center, velocity, radius, lifetime, self.move_particle_color, self.move_particle_glow_color, has_glow=True)
+            self.particles.append(p)
+
+        # update_particles
+        to_remove = []
+        for entity in self.particles:
+            if entity.dead:
+                to_remove.append(entity)
+            else:
+                entity.update(surface)
+
+        for entity in to_remove:
+            self.particles.remove(entity)
 

@@ -47,7 +47,7 @@ class Player:
         self.ghost_speed = 2
         self.ghost_duration_time = 10
         self.ghost_count = 0
-        self.godmode = True
+        self.godmode = False
         self.dead = False
 
         self.left_border_rect = pygame.rect.Rect(0, 0, 16, 288)
@@ -92,14 +92,18 @@ class Player:
 
         self.particles = []
 
+        self.death_particle_ammount = 60
+        self.death_particle_color = (255, 67, 58)
+        self.death_particle_glow_color = (12, 1, 0)
+
         self.jump_particle_ammount = 20
         self.jump_particle_color = (224, 192, 95)
-        self.jump_particle_glow_color = (28, 21, 0)
+        self.jump_particle_glow_color = (14, 11, 0)
 
-        self.move_particle_time = 10
+        self.move_particle_time = 4
         self.move_particle_count = 0
         self.move_particle_color = (206, 206, 206)
-        self.move_particle_glow_color = (10, 10, 10)
+        self.move_particle_glow_color = (5, 5, 5)
 
     def update(self, surface, paused):
         if not self.dead:
@@ -308,6 +312,7 @@ class Player:
     def hit(self):
         if not self.godmode:
             self.dead = True
+            self.add_death_particles()
 
     def get_image(self):
         before_rect = self.rect.copy()
@@ -401,6 +406,16 @@ class Player:
             p = particle.Particle(center, velocity, radius, lifetime, self.jump_particle_color, self.jump_particle_glow_color, has_glow=True)
             self.particles.append(p)
 
+    def add_death_particles(self):
+        for i in range(self.death_particle_ammount):
+            center = list(funcs.render_pos_to_screen_pos([self.rect.x + (self.rect.width / self.jump_particle_ammount) * i, self.rect.bottom], (1920, 1080)))
+            velocity = [randint(1, 40) / 10 - 2, randint(1, 80) / -10]
+            radius = randint(1, 3)
+            lifetime = 2
+
+            p = particle.Particle(center, velocity, radius, lifetime, self.death_particle_color, self.death_particle_glow_color, has_glow=True, gravity=.5)
+            self.particles.append(p)
+
     def update_particles(self, surface):
         # spawn particle
         if self.dx != 0 or self.dy != 0:
@@ -411,7 +426,7 @@ class Player:
                 center = list(funcs.render_pos_to_screen_pos(self.rect.center, (1920, 1080)))
                 velocity = [randint(1, 10) / 10 - .5, randint(1, 10) / 10 - .5]
                 radius = randint(1, 3)
-                lifetime = 2
+                lifetime = 3
 
                 p = particle.Particle(center, velocity, radius, lifetime, self.move_particle_color, self.move_particle_glow_color, has_glow=True)
                 self.particles.append(p)
