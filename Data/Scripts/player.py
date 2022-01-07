@@ -1,5 +1,6 @@
 import pygame
 from random import randint
+import time
 
 
 from . import particle
@@ -27,7 +28,7 @@ class MapBorder:
 
 class Player:
     def __init__(self, render_pos, landed_rocks, falling_rocks, chests, items, bullets):
-        self.pos = render_pos
+        self.pos = list(render_pos)
         self.x, self.y = render_pos
         self.direction = 'R'
         self.state = 'idle'
@@ -62,6 +63,9 @@ class Player:
         self.frame = 0
         self.frame_change = 0.1
         self.frame_count = 0
+
+        self.last_time = time.time()
+        self.dt = 1
 
         self.idle_frames_left, self.idle_frames_right = load_frames('Data/Assets/Sprites/Player/Idle/player_idle_', self.idle_frames_length)
         self.jump_frames_left, self.jump_frames_right = load_frames('Data/Assets/Sprites/Player/Jump/player_jump_', self.jump_frames_length)
@@ -108,14 +112,21 @@ class Player:
     def update(self, surface, paused):
         if not self.dead:
             if not paused:
+                # determine delta time
+                self.dt = time.time() - self.last_time
+                self.dt *= 60
+                self.last_time = time.time()
+
                 # move x, check collision
-                self.rect.x += self.dx
+                self.x += self.dx * self.dt
+                self.rect.x = self.x
                 self.check_collision_x()
 
                 # move y, check collision
                 if not self.is_ghost:
                     self.calc_grav()
-                self.rect.y += self.dy
+                self.y += self.dy * self.dt
+                self.rect.y = self.y
                 self.check_collision_y()
 
                 # check bullets
@@ -142,53 +153,27 @@ class Player:
         if self.dy == 0:
             self.dy = 1
         else:
-            self.dy += self.gravity
+            self.dy += self.gravity * self.dt
 
     def check_collision_x(self):
         landed_rock_hit_list = pygame.sprite.spritecollide(self, self.landed_rocks, False, pygame.sprite.collide_mask)
         if len(landed_rock_hit_list) > 0:
-            if self.dx > 0:
-                if not self.is_ghost:
-                    self.rect.x -= self.speed
-                else:
-                    self.rect.x -= self.ghost_speed
-            elif self.dx < 0:
-                if not self.is_ghost:
-                    self.rect.x += self.speed
-                else:
-                    self.rect.x += self.ghost_speed
+            self.collide_x()
 
         falling_rock_hit_list = pygame.sprite.spritecollide(self, self.falling_rocks, False, pygame.sprite.collide_mask)
         if len(falling_rock_hit_list) > 0:
-            if self.dx > 0:
-                if not self.is_ghost:
-                    self.rect.x -= self.speed
-                else:
-                    self.rect.x -= self.ghost_speed
-            elif self.dx < 0:
-                if not self.is_ghost:
-                    self.rect.x += self.speed
-                else:
-                    self.rect.x += self.ghost_speed
+            self.collide_x()
 
         border_collision = pygame.sprite.spritecollide(self, [self.map_border], False, pygame.sprite.collide_mask)
         if border_collision:
-            if self.dx > 0:
-                if not self.is_ghost:
-                    self.rect.x -= self.speed
-                else:
-                    self.rect.x -= self.ghost_speed
-            elif self.dx < 0:
-                if not self.is_ghost:
-                    self.rect.x += self.speed
-                else:
-                    self.rect.x += self.ghost_speed
+            self.collide_x()
 
     def check_collision_y(self):
         landed_rock_hit_list = pygame.sprite.spritecollide(self, self.landed_rocks, False, pygame.sprite.collide_mask)
         for entity in landed_rock_hit_list:
             # check if dy > 0?
             self.rect.bottom = entity.rect.top
+            self.y = self.rect.top
             self.dy = 0
             self.jump_count = self.max_jumps
             if self.dx != 0:
@@ -200,15 +185,31 @@ class Player:
         for entity in falling_rock_hit_list:
             if self.rect.y >= entity.rect.y:
                 self.hit()
-
             else:
                 self.rect.bottom = entity.rect.top
+                self.y = self.rect.top
                 self.dy = 0
                 self.jump_count = self.max_jumps
                 if self.dx != 0:
                     self.state = 'run'
                 else:
                     self.state = 'idle'
+
+    def collide_x(self):
+        if self.dx > 0:
+            if not self.is_ghost:
+                self.x -= self.speed * self.dt
+                self.rect.x = self.x
+            else:
+                self.x -= self.ghost_speed * self.dt
+                self.rect.x = self.x
+        elif self.dx < 0:
+            if not self.is_ghost:
+                self.x += self.speed * self.dt
+                self.rect.x = self.x
+            else:
+                self.x += self.ghost_speed * self.dt
+                self.rect.x = self.x
 
     def check_bullets(self):
         bullet_hit_list = pygame.sprite.spritecollide(self, self.bullets, False, pygame.sprite.collide_mask)
@@ -318,7 +319,7 @@ class Player:
         before_rect = self.rect.copy()
 
         self.frame_count += 1
-        if self.frame_count / 60 >= self.frame_change:
+        if self.frame_count / 60 >= self.frame_change / self.dt:
             self.frame += 1
             self.frame_count = 0
 
@@ -339,7 +340,7 @@ class Player:
                     self.frame = 0
 
                 if not self.jump_spin_done:
-                    self.jump_rotation += self.jump_spin_degrees
+                    self.jump_rotation += self.jump_spin_degrees * self.dt
                     if self.jump_rotation >= 360 * self.rotations_per_jump:
                         self.jump_rotation = 0
                         self.jump_spin_done = True
@@ -449,6 +450,8 @@ class Player:
         self.direction = 'R'
         self.state = 'idle'
         self.rect.center = center
+        self.x = self.rect.x
+        self.y = self.rect.y
         self.jump_count = self.max_jumps
         self.dx = 0
         self.dy = 0
@@ -458,4 +461,6 @@ class Player:
         self.ghost_count = 0
         self.frame = 0
         self.frame_count = 0
+        self.last_time = time.time()
+        self.dt = 1
         self.particles.clear()

@@ -1,6 +1,8 @@
-import pygame
-import random
 import json
+import random
+import time
+
+import pygame
 
 from Data.Scripts import colors, rock_handler, bullet_handler, player, hud
 
@@ -33,6 +35,9 @@ class Game:
 
         self.map_shadow_speed = 1
         self.map_shadow_change_speed = 0.2
+
+        self.last_time = time.time()
+        self.dt = 1
 
         self.map_shadow_lr_60_count = random.randint(0, 60)
         self.map_shadow_lr_60_frame = random.randint(0, 2)
@@ -131,6 +136,10 @@ class Game:
         while self.running:
             self.clock.tick(60)
             print(self.clock.get_fps())
+            # determine delta time
+            self.dt = time.time() - self.last_time
+            self.dt *= 60
+            self.last_time = time.time()
             # input
             self.handle_input()
             # background

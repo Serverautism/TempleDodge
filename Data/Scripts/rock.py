@@ -1,5 +1,6 @@
 import pygame
 from random import randint
+import time
 
 
 from . import particle
@@ -11,6 +12,9 @@ class Rock:
         self.x, self.y = render_pos
         self.speed = speed
         self.landed = landed
+
+        self.last_time = time.time()
+        self.dt = 1
 
         self.image = pygame.image.load('Data/Assets/Sprites/Rock/rock.png').convert_alpha()
         self.mask = pygame.mask.from_surface(self.image)
@@ -27,16 +31,24 @@ class Rock:
 
     def update(self, surface, paused, landed_rocks=None):
         if not self.landed and not paused:
-            self.rect.y += self.speed
+            # determine delta time
+            self.dt = time.time() - self.last_time
+            self.dt *= 60
+            self.last_time = time.time()
+
+            self.y += self.speed * self.dt
+            self.rect.y = self.y
             for entity in landed_rocks:
                 if self.rect.colliderect(entity.rect):
                     self.rect.bottom = entity.rect.top
+                    self.y = self.rect.top
                     self.landed = True
 
         surface.blit(self.image, self.rect)
 
     def move_down(self, pixels):
-        self.rect.y += pixels
+        self.y += pixels
+        self.rect.y = self.y
 
     def update_particles(self, surface):
         if not self.landed:
