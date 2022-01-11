@@ -139,7 +139,7 @@ class Hud:
         self.replay_text_render_y = self.r_icon_y + self.r_icon.get_height() / 2 - self.replay_text_render.get_height() / 2
 
     def draw_text_background(self, surface):
-        self.text_background_count += 1
+        self.text_background_count += 1 * self.dt
         if self.text_background_count / 60 >= self.text_background_change:
             self.text_background_count = 0
             self.text_background_frame += 1
