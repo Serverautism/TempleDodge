@@ -130,7 +130,7 @@ class Item:
             self.velocity[1] += self.gravity * self.dt
 
     def check_collectable(self):
-        self.collectable_delay_count += 1
+        self.collectable_delay_count += 1 * self.dt
         if self.collectable_delay_count >= self.collectable_delay:
             self.collectable = True
 
