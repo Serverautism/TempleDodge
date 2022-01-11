@@ -1,5 +1,6 @@
 import pygame
 from random import randint
+import time
 
 
 from . import particle
@@ -51,7 +52,15 @@ class Item:
         self.rect.center = self.center
         self.mask = pygame.mask.from_surface(self.image)
 
+        self.dt = 0
+        self.last_time = time.time()
+
     def update(self, surface, paused):
+        # calculate delta time
+        self.dt = time.time() - self.last_time
+        self.dt *= 60
+        self.last_time = time.time()
+
         # get image
         self.get_image()
 
@@ -61,12 +70,12 @@ class Item:
                 self.check_collectable()
 
             # move left right, check collision
-            self.center[0] += self.velocity[0]
+            self.center[0] += self.velocity[0] * self.dt
             self.rect.centerx = self.center[0]
             self.check_collision_x()
 
             # move up down, check collision
-            self.center[1] += self.velocity[1]
+            self.center[1] += self.velocity[1] * self.dt
             self.rect.centery = self.center[1]
             self.check_collision_y()
             self.apply_gravity()
@@ -77,7 +86,7 @@ class Item:
     def check_collision_x(self):
         landed_rock_hit_list = pygame.sprite.spritecollide(self, self.landed_rocks, False)
         if len(landed_rock_hit_list) > 0:
-            self.center[0] -= self.velocity[0]
+            self.center[0] -= self.velocity[0] * self.dt
             self.rect.centerx = self.center[0]
 
             self.velocity[0] *= -.75
@@ -85,23 +94,25 @@ class Item:
         falling_rock_hit_list = pygame.sprite.spritecollide(self, self.falling_rocks, False)
         if len(falling_rock_hit_list) > 0:
             if self.velocity[0] != 0:
-                self.center[0] -= self.velocity[0]
+                self.center[0] -= self.velocity[0] * self.dt
                 self.rect.centerx = self.center[0]
             self.velocity[0] *= -.75
 
         if self.rect.colliderect(self.left_border_rect):
             self.rect.left = self.left_border_rect.right
+            self.center = list(self.rect.center)
             self.velocity[0] *= -.75
 
         if self.rect.colliderect(self.right_border_rect):
             self.rect.right = self.right_border_rect.left
+            self.center = list(self.rect.center)
             self.velocity[0] *= -.75
 
     def check_collision_y(self):
         landed_rock_hit_list = pygame.sprite.spritecollide(self, self.landed_rocks, False)
         if len(landed_rock_hit_list) > 0:
             if self.velocity[1] != 0:
-                self.center[1] -= self.velocity[1]
+                self.center[1] -= self.velocity[1] * self.dt
                 self.rect.centery = self.center[1]
             self.velocity[1] *= -.25
 
@@ -110,13 +121,13 @@ class Item:
             if self.rect.y >= entity.rect.y:
                 self.collected = True
             else:
-                self.center[1] -= self.velocity[1]
+                self.center[1] -= self.velocity[1] * self.dt
                 self.rect.centery = self.center[1]
                 self.velocity[1] *= -.25
 
     def apply_gravity(self):
         if self.velocity[1] != 0:
-            self.velocity[1] += self.gravity
+            self.velocity[1] += self.gravity * self.dt
 
     def check_collectable(self):
         self.collectable_delay_count += 1
@@ -139,8 +150,8 @@ class Item:
 
     def update_particles(self, surface):
         # spawn particle
-        self.move_particle_count += 1
-        if self.move_particle_count == self.move_particle_time:
+        self.move_particle_count += 1 * self.dt
+        if self.move_particle_count >= self.move_particle_time:
             self.move_particle_count = 0
 
             center = list(funcs.render_pos_to_screen_pos(self.rect.center, (1920, 1080)))

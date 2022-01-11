@@ -255,12 +255,13 @@ class Game:
         for rect in self.background_rects:
             render = pygame.transform.rotate(rect[0], rect[3])
 
-            rect[1][1] += self.background_rects_speed
+            rect[1][1] += self.background_rects_speed * self.dt
             if rect[3] > 0:
-                rect[3] += self.background_rects_rotation_speed
+                rect[3] += self.background_rects_rotation_speed * self.dt
             elif rect[3] < 0:
-                rect[3] -= self.background_rects_rotation_speed
+                rect[3] -= self.background_rects_rotation_speed * self.dt
 
+            # move rect if off screen
             if self.background_rects_speed > 0 and rect[1][1] - render.get_height() / 2 > self.render_height:
                 min_y = min([i[1][1] for i in self.background_rects if i[1][0] == rect[1][0]])
                 rect[1][1] = min_y - self.render_height / 3
@@ -275,8 +276,8 @@ class Game:
 
         # lines
         for line in self.background_lines:
-            line[0][1] += self.background_lines_speed
-            line[1][1] += self.background_lines_speed
+            line[0][1] += self.background_lines_speed * self.dt
+            line[1][1] += self.background_lines_speed * self.dt
 
             if self.background_lines_speed > 0 and min([line[0][1], line[1][1]]) > self.render_height:
                 min_line_y = min([i[0][1] for i in self.background_lines])
@@ -301,8 +302,8 @@ class Game:
 
     def draw_map_shadows(self, surface):
         # left and right
-        self.map_shadow_lr_ys[0] += self.map_shadow_speed
-        self.map_shadow_lr_ys[1] += self.map_shadow_speed
+        self.map_shadow_lr_ys[0] += self.map_shadow_speed * self.dt
+        self.map_shadow_lr_ys[1] += self.map_shadow_speed * self.dt
 
         if self.map_shadow_lr_ys[0] > self.render_height:
             self.map_shadow_lr_ys[0] -= self.map_shadow_image_l_20_0.get_height() * 2
@@ -314,14 +315,14 @@ class Game:
             self.map_shadow_lr_60_frame += 1
             if self.map_shadow_lr_60_frame >= 3:
                 self.map_shadow_lr_60_frame = 0
-        self.map_shadow_lr_60_count += 1
+        self.map_shadow_lr_60_count += 1 * self.dt
 
         if self.map_shadow_lr_20_count / 60 >= self.map_shadow_change_speed:
             self.map_shadow_lr_20_count = 0
             self.map_shadow_lr_20_frame += 1
             if self.map_shadow_lr_20_frame >= 3:
                 self.map_shadow_lr_20_frame = 0
-        self.map_shadow_lr_20_count += 1
+        self.map_shadow_lr_20_count += 1 * self.dt
 
         for y in self.map_shadow_lr_ys:
             if self.map_shadow_lr_60_frame == 0:
@@ -345,8 +346,8 @@ class Game:
                 surface.blit(self.map_shadow_image_r_20_2, (self.map_shadow_lr_xs[1], y))
 
         # top
-        self.map_shadow_t_xs[0] += self.map_shadow_speed
-        self.map_shadow_t_xs[1] += self.map_shadow_speed
+        self.map_shadow_t_xs[0] += self.map_shadow_speed * self.dt
+        self.map_shadow_t_xs[1] += self.map_shadow_speed * self.dt
 
         if self.map_shadow_t_xs[0] > self.render_width:
             self.map_shadow_t_xs[0] -= 512 * 2
@@ -358,14 +359,14 @@ class Game:
             self.map_shadow_t_60_frame += 1
             if self.map_shadow_t_60_frame >= 3:
                 self.map_shadow_t_60_frame = 0
-        self.map_shadow_t_60_count += 1
+        self.map_shadow_t_60_count += 1 * self.dt
 
         if self.map_shadow_t_20_count / 60 >= self.map_shadow_change_speed:
             self.map_shadow_t_20_count = 0
             self.map_shadow_t_20_frame += 1
             if self.map_shadow_t_20_frame >= 3:
                 self.map_shadow_t_20_frame = 0
-        self.map_shadow_t_20_count += 1
+        self.map_shadow_t_20_count += 1 * self.dt
 
         for x in self.map_shadow_t_xs:
             if self.map_shadow_t_60_frame == 0:
@@ -383,8 +384,8 @@ class Game:
                 surface.blit(self.map_shadow_image_t_20_2, (x, 0))
 
         # bottom
-        self.map_shadow_b_xs[0] -= self.map_shadow_speed
-        self.map_shadow_b_xs[1] -= self.map_shadow_speed
+        self.map_shadow_b_xs[0] -= self.map_shadow_speed * self.dt
+        self.map_shadow_b_xs[1] -= self.map_shadow_speed * self.dt
 
         if self.map_shadow_b_xs[0] + 512 < 0:
             self.map_shadow_b_xs[0] += 512 * 2
@@ -396,14 +397,14 @@ class Game:
             self.map_shadow_b_60_frame += 1
             if self.map_shadow_b_60_frame >= 3:
                 self.map_shadow_b_60_frame = 0
-        self.map_shadow_b_60_count += 1
+        self.map_shadow_b_60_count += 1 * self.dt
 
         if self.map_shadow_b_20_count / 60 >= self.map_shadow_change_speed:
             self.map_shadow_b_20_count = 0
             self.map_shadow_b_20_frame += 1
             if self.map_shadow_b_20_frame >= 3:
                 self.map_shadow_b_20_frame = 0
-        self.map_shadow_b_20_count += 1
+        self.map_shadow_b_20_count += 1 * self.dt
 
         for x in self.map_shadow_b_xs:
             if self.map_shadow_b_60_frame == 0:

@@ -1,5 +1,6 @@
 import pygame
 from pygame import font
+import time
 
 
 from . import funcs, colors
@@ -78,7 +79,15 @@ class Hud:
 
         self.render_hud(self.last_mana_count, self.last_gold_count)
 
+        self.dt = 0
+        self.last_time = time.time()
+
     def update(self, surface, paused):
+        # calc delta time
+        self.dt = time.time() - self.last_time
+        self.dt *= 60
+        self.last_time = time.time()
+
         # get the counts
         gold = self.player.gold_count
         mana = self.player.mana_count
@@ -102,11 +111,11 @@ class Hud:
 
         if new_highscore:
             if self.new_highscore_direction == 'R':
-                self.new_highscore_rotation += self.new_highscore_rotation_change
+                self.new_highscore_rotation += self.new_highscore_rotation_change * self.dt
                 if self.new_highscore_rotation >= self.new_highscore_rotation_max:
                     self.new_highscore_direction = 'L'
             else:
-                self.new_highscore_rotation -= self.new_highscore_rotation_change
+                self.new_highscore_rotation -= self.new_highscore_rotation_change * self.dt
                 if self.new_highscore_rotation <= -self.new_highscore_rotation_max:
                     self.new_highscore_direction = 'R'
 

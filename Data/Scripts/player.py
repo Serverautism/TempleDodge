@@ -111,12 +111,11 @@ class Player:
 
     def update(self, surface, paused):
         if not self.dead:
+            # determine delta time
+            self.dt = time.time() - self.last_time
+            self.dt *= 60
+            self.last_time = time.time()
             if not paused:
-                # determine delta time
-                self.dt = time.time() - self.last_time
-                self.dt *= 60
-                self.last_time = time.time()
-
                 # move x, check collision
                 self.x += self.dx * self.dt
                 self.rect.x = self.x

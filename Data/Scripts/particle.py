@@ -1,4 +1,5 @@
 import pygame
+import time
 
 
 class Particle:
@@ -18,29 +19,37 @@ class Particle:
 
         self.dead = False
 
+        self.last_time = time.time()
+        self.dt = 0
+
         if self.static_size and self.has_glow:
             self.glow_image = self.get_glow()
         elif not self.static_size:
             self.radius_change = self.radius / self.lifetime
 
     def update(self, surface):
+        # calc delta time
+        self.dt = time.time() - self.last_time
+        self.dt *= 60
+        self.last_time = time.time()
+
         # change position
-        self.center[0] += self.velocity[0]
-        self.center[1] += self.velocity[1]
+        self.center[0] += self.velocity[0] * self.dt
+        self.center[1] += self.velocity[1] * self.dt
 
         # interact with rocks
 
         # apply gravity
-        self.velocity[1] += self.gravity
+        self.velocity[1] += self.gravity * self.dt
 
         # change radius
         if not self.static_size:
-            self.radius -= self.radius_change
+            self.radius -= self.radius_change * self.dt
             if self.radius <= 0:
                 self.dead = True
                 return
         else:
-            self.lifetime -= 1
+            self.lifetime -= 1 * self.dt
             if self.lifetime <= 0:
                 self.dead = True
 

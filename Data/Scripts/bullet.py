@@ -1,6 +1,7 @@
 import pygame
 import math
 from random import randint
+import time
 
 
 from . import particle
@@ -63,11 +64,18 @@ class Bullet:
         self.move_particle_color = (131, 31, 255)
         self.move_particle_glow_color = (5, 0, 11)
 
+        self.dt = 0
+        self.last_time = time.time()
+
     def update(self, surface, paused):
+        # calc delta time
+        self.dt = time.time() - self.last_time
+        self.dt *= 60
+        self.last_time = time.time()
         if not paused:
             # move
-            self.position[0] += self.velocity[0]
-            self.position[1] += self.velocity[1]
+            self.position[0] += self.velocity[0] * self.dt
+            self.position[1] += self.velocity[1] * self.dt
             self.rect.center = self.position
 
             self.check_dead()
@@ -76,8 +84,8 @@ class Bullet:
 
             glow_big, glow_small = self.get_glow()
 
-            surface.blit(glow_big, (self.rect.center[0] - self.big_glow_size, self.rect.center[1] - self.big_glow_size), special_flags=pygame.BLEND_RGB_ADD)
-            surface.blit(glow_small, (self.rect.center[0] - self.small_glow_size, self.rect.center[1] - self.small_glow_size), special_flags=pygame.BLEND_RGB_ADD)
+            surface.blit(glow_big, (self.rect.center[0] - glow_big.get_width() / 2, self.rect.center[1] - glow_big.get_height() / 2), special_flags=pygame.BLEND_RGB_ADD)
+            surface.blit(glow_small, (self.rect.center[0] - glow_small.get_width() / 2, self.rect.center[1] - glow_small.get_height() / 2), special_flags=pygame.BLEND_RGB_ADD)
             surface.blit(self.image, self.rect)
 
         if not self.sparkle_done:
@@ -85,17 +93,20 @@ class Bullet:
 
     def get_glow(self):
         if self.glow_grow:
+            self.big_glow_size += 1 * self.dt
+            self.small_glow_size += 1 * self.dt
+
             if self.big_glow_size >= self.rect.width * 3:
                 self.glow_grow = False
 
-            self.big_glow_size += 1
-            self.small_glow_size += 1
         else:
+            self.big_glow_size -= 1 * self.dt
+            self.small_glow_size -= 1 * self.dt
+
             if self.big_glow_size <= self.rect.width * 2:
                 self.glow_grow = True
-
-            self.big_glow_size -= 1
-            self.small_glow_size -= 1
+                self.big_glow_size = self.rect.width * 2
+                self.small_glow_size = self.rect.width
 
         big_glow_surface = pygame.Surface((self.big_glow_size * 2, self.big_glow_size * 2))
         big_glow_surface.set_colorkey((0, 0, 0))
