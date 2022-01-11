@@ -129,7 +129,7 @@ class Bullet:
             self.dead = True
 
     def draw_sparkle(self, surface):
-        self.frame_count += 1
+        self.frame_count += 1 * self.dt
         if self.frame_count / 60 >= self.frame_change:
             self.frame_count = 0
             self.frame += 1

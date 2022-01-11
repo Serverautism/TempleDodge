@@ -133,7 +133,7 @@ class Game:
 
     def run(self):
         while self.running:
-            self.clock.tick(60)
+            self.clock.tick(20)
             print(self.clock.get_fps())
             # determine delta time
             self.dt = time.time() - self.last_time

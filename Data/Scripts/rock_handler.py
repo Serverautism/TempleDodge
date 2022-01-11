@@ -1,6 +1,8 @@
 import pygame
 import random
 import copy
+import time
+
 
 from . import rock
 from . import chest
@@ -51,7 +53,14 @@ class RockHandler:
 
         self.generate_landed_rocks()
 
+        self.dt = 0
+        self.last_time = time.time()
+
     def update(self, spawn_rocks, surface, paused):
+        # determine delta time
+        self.dt = time.time() - self.last_time
+        self.dt *= 60
+        self.last_time = time.time()
         # unblock blocked collums
         to_remove = []
         for row in self.blocked_rows:
@@ -65,7 +74,7 @@ class RockHandler:
 
         # spawn rocks
         if not paused:
-            self.time_since_last_spawn += 1
+            self.time_since_last_spawn += 1 * self.dt
             if spawn_rocks and self.time_since_last_spawn >= self.spawn_time:
                 rows_min_index = self.row_counter.index(min(self.row_counter))
                 self.time_since_last_spawn = 0
