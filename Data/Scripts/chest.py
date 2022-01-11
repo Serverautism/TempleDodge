@@ -30,18 +30,22 @@ class Chest:
             self.drop_count = 5
             self.death_particle_color = (110, 97, 0)
             self.death_particle_glow_color = (5, 4, 0)
+            self.open_particle_color = (120, 107, 10)
+            self.open_particle_glow_color = (5, 4, 0)
         elif self.name == 'mana':
             self.drop_count = 1
             self.death_particle_color = (0, 74, 112)
             self.death_particle_glow_color = (0, 4, 6)
+            self.open_particle_color = (10, 84, 122)
+            self.open_particle_glow_color = (0, 4, 6)
 
         self.dt = 0
         self.last_time = time.time()
 
         self.particles = []
 
+        self.open_particle_ammount = 60
         self.death_particle_ammount = 60
-        self.death_particle_speed = 5
 
     def update(self, surface,  all_rocks):
         if not self.crushed:
@@ -69,8 +73,9 @@ class Chest:
             self.done = True
 
     def open(self):
-        if not self.opened:
+        if not self.opened and not self.crushed:
             self.opened = True
+            self.add_open_particles()
 
             for i in range(self.drop_count):
                 velocity = [randint(0, 40)/10 - 2, -1]
@@ -78,17 +83,31 @@ class Chest:
 
     def crush(self):
         self.crushed = True
-        self.add_death_particles()
 
-    def add_death_particles(self):
+        if not self.opened:
+            self.add_death_particles(5)
+        else:
+            self.add_death_particles(2)
+
+    def add_death_particles(self, speed):
         for i in range(self.death_particle_ammount):
             center = list(funcs.render_pos_to_screen_pos(self.rect.center, (1920, 1080)))
             radians = math.radians((360 / self.death_particle_ammount) * i)
-            velocity = [self.death_particle_speed * math.cos(radians) + (randint(1, 10) / 10 - .5), self.death_particle_speed * math.sin(radians) + (randint(1, 10) / 10 - .5)]
+            velocity = [speed * math.cos(radians) + (randint(1, 10) / 10 - .5), speed * math.sin(radians) + (randint(1, 10) / 10 - .5)]
             radius = randint(1, 5)
             lifetime = 2
 
             p = particle.Particle(center, velocity, radius, lifetime, self.death_particle_color, self.death_particle_glow_color, has_glow=True, gravity=.4)
+            self.particles.append(p)
+
+    def add_open_particles(self):
+        for i in range(self.open_particle_ammount):
+            center = list(funcs.render_pos_to_screen_pos(self.rect.center, (1920, 1080)))
+            velocity = [randint(1, 40) / 10 - 2, -8 + (randint(1, 20) / 10 - 1)]
+            radius = randint(1, 5)
+            lifetime = 1.5
+
+            p = particle.Particle(center, velocity, radius, lifetime, self.open_particle_color, self.open_particle_glow_color, has_glow=True, gravity=.5)
             self.particles.append(p)
 
     def update_particles(self, surface):
