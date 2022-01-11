@@ -52,8 +52,8 @@ class Rock:
 
     def update_particles(self, surface):
         if not self.landed:
-            self.particle_count += 1
-            if self.particle_count == self.particle_time:
+            self.particle_count += 1 * self.dt
+            if self.particle_count >= self.particle_time:
                 self.particle_count = 0
 
                 center_1 = list(funcs.render_pos_to_screen_pos(self.rect.topleft, (1920, 1080)))

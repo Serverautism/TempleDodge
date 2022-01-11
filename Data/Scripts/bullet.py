@@ -144,8 +144,8 @@ class Bullet:
 
     def update_particles(self, surface):
         # spawn particle
-        self.move_particle_count += 1
-        if self.move_particle_count == self.move_particle_time:
+        self.move_particle_count += 1 * self.dt
+        if self.move_particle_count >= self.move_particle_time:
             self.move_particle_count = 0
 
             center = list(funcs.render_pos_to_screen_pos(self.rect.center, (1920, 1080)))

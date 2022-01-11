@@ -1,8 +1,12 @@
 import pygame
 from random import randint
+import time
+import math
 
 
 from . import item
+from . import particle
+from . import funcs
 
 
 class Chest:
@@ -24,11 +28,28 @@ class Chest:
         
         if self.name == 'gold':
             self.drop_count = 5
+            self.death_particle_color = (110, 97, 0)
+            self.death_particle_glow_color = (5, 4, 0)
         elif self.name == 'mana':
             self.drop_count = 1
+            self.death_particle_color = (0, 74, 112)
+            self.death_particle_glow_color = (0, 4, 6)
+
+        self.dt = 0
+        self.last_time = time.time()
+
+        self.particles = []
+
+        self.death_particle_ammount = 60
+        self.death_particle_speed = 5
 
     def update(self, surface,  all_rocks):
         if not self.crushed:
+            # determine delta time
+            self.dt = time.time() - self.last_time
+            self.dt *= 60
+            self.last_time = time.time()
+
             self.rect.bottom = self.rock.rect.top
 
             for entity in all_rocks:
@@ -57,4 +78,26 @@ class Chest:
 
     def crush(self):
         self.crushed = True
-        # spawn particles
+        self.add_death_particles()
+
+    def add_death_particles(self):
+        for i in range(self.death_particle_ammount):
+            center = list(funcs.render_pos_to_screen_pos(self.rect.center, (1920, 1080)))
+            radians = math.radians((360 / self.death_particle_ammount) * i)
+            velocity = [self.death_particle_speed * math.cos(radians) + (randint(1, 10) / 10 - .5), self.death_particle_speed * math.sin(radians) + (randint(1, 10) / 10 - .5)]
+            radius = randint(1, 5)
+            lifetime = 2
+
+            p = particle.Particle(center, velocity, radius, lifetime, self.death_particle_color, self.death_particle_glow_color, has_glow=True, gravity=.4)
+            self.particles.append(p)
+
+    def update_particles(self, surface):
+        to_remove = []
+        for entity in self.particles:
+            if entity.dead:
+                to_remove.append(entity)
+            else:
+                entity.update(surface)
+
+        for entity in to_remove:
+            self.particles.remove(entity)

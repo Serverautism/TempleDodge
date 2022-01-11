@@ -48,7 +48,7 @@ class Player:
         self.ghost_speed = 2
         self.ghost_duration_time = 10
         self.ghost_count = 0
-        self.godmode = False
+        self.godmode = True
         self.dead = False
 
         self.left_border_rect = pygame.rect.Rect(0, 0, 16, 288)
@@ -403,12 +403,12 @@ class Player:
             radius = randint(1, 3)
             lifetime = 1
 
-            p = particle.Particle(center, velocity, radius, lifetime, self.jump_particle_color, self.jump_particle_glow_color, has_glow=True)
+            p = particle.Particle(center, velocity, radius, lifetime, self.jump_particle_color, self.jump_particle_glow_color)
             self.particles.append(p)
 
     def add_death_particles(self):
         for i in range(self.death_particle_ammount):
-            center = list(funcs.render_pos_to_screen_pos([self.rect.x + (self.rect.width / self.jump_particle_ammount) * i, self.rect.bottom], (1920, 1080)))
+            center = list(funcs.render_pos_to_screen_pos([self.rect.x + (self.rect.width / self.death_particle_ammount) * i, self.rect.bottom], (1920, 1080)))
             velocity = [randint(1, 40) / 10 - 2, randint(1, 80) / -10]
             radius = randint(1, 3)
             lifetime = 2
@@ -419,8 +419,8 @@ class Player:
     def update_particles(self, surface):
         # spawn particle
         if self.dx != 0 or self.dy != 0:
-            self.move_particle_count += 1
-            if self.move_particle_count == self.move_particle_time:
+            self.move_particle_count += 1 * self.dt
+            if self.move_particle_count >= self.move_particle_time:
                 self.move_particle_count = 0
 
                 center = list(funcs.render_pos_to_screen_pos(self.rect.center, (1920, 1080)))

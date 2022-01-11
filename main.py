@@ -63,7 +63,6 @@ class Game:
         self.player_spawn = (self.render_width / 2, self.render_height / 2)
 
         self.items = []
-        self.particles = []
 
         with open('Data/Files/gamesave.json', 'r') as f:
             self.game_save = json.load(f)
@@ -169,6 +168,7 @@ class Game:
             self.rock_handler.update_particles(self.screen)
             self.player.update_particles(self.screen)
             self.update_item_particles(self.screen)
+            self.update_chest_particles(self.screen)
             self.bullet_handler.update_particles(self.screen)
 
             # update screen
@@ -220,10 +220,6 @@ class Game:
                     self.items += entity.items
                     entity.items.clear()
 
-                if entity.opened and len(entity.particles) > 0:
-                    self.particles += entity.particles
-                    entity.particles.clear()
-
             else:
                 to_remove.append(entity)
 
@@ -245,6 +241,10 @@ class Game:
 
     def update_item_particles(self, surface):
         for entity in self.items:
+            entity.update_particles(surface)
+
+    def update_chest_particles(self, surface):
+        for entity in self.chests:
             entity.update_particles(surface)
 
     def draw_background(self, surface):
