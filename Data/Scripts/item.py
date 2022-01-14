@@ -16,7 +16,7 @@ class Item:
         self.landed_rocks = landed_rocks
         self.falling_rocks = falling_rocks
         self.frames_count = 0
-        self.frames_change = 0.2
+        self.frames_change = 5
         self.frame = randint(0, 5)
         self.collected = False
         self.collectable = False
@@ -138,8 +138,8 @@ class Item:
         self.collected = True
 
     def get_image(self):
-        self.frames_count += 1
-        if self.frames_count / 60 >= self.frames_change:
+        self.frames_count += 1 * self.dt
+        if self.frames_count >= self.frames_change:
             self.frames_count = 0
             self.frame += 1
             if self.frame > self.frames_len - 1:

@@ -232,7 +232,7 @@ class Player:
                         self.mana_count += 1
 
     def check_ghost_state(self):
-        self.ghost_count += 1
+        self.ghost_count += 1 * self.dt
         if self.ghost_count / 60 >= self.ghost_duration_time:
             self.is_ghost = False
             self.ghost_count = 0
