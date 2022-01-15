@@ -131,6 +131,11 @@ class Game:
         self.map_shadow_t_xs = [0, -self.map_shadow_image_t_20_0.get_width()]
         self.map_shadow_b_y = self.render_height - self.map_shadow_image_b_20_0.get_height()
 
+        # music
+        pygame.mixer.music.load('Data/Assets/Sound/BackgroundMusic/background_music_1.wav')
+        pygame.mixer.music.set_volume(.1)
+        pygame.mixer.music.play(-1)
+
     def run(self):
         while self.running:
             self.clock.tick(60)

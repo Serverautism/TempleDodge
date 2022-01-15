@@ -29,6 +29,8 @@ class Rock:
         self.particle_color = (226, 156, 255)
         self.particle_glow_color = (6, 0, 8)
 
+        self.land_sound = pygame.mixer.Sound('Data/Assets/Sound/Sfx/')
+
     def update(self, surface, paused, landed_rocks=None):
         if not self.landed and not paused:
             # determine delta time
