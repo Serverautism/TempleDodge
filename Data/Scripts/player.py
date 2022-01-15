@@ -109,6 +109,15 @@ class Player:
         self.move_particle_color = (206, 206, 206)
         self.move_particle_glow_color = (5, 5, 5)
 
+        self.jump_sound = pygame.mixer.Sound('Data/Assets/Sound/Sfx/jump_1.wav')
+        self.jump_sound.set_volume(.1)
+
+        self.pickup_coin_sound = pygame.mixer.Sound('Data/Assets/Sound/Sfx/pickup_coin_1.wav')
+        self.pickup_coin_sound.set_volume(.1)
+
+        self.pickup_mana_sound = pygame.mixer.Sound('Data/Assets/Sound/Sfx/pickup_mana_1.wav')
+        self.pickup_mana_sound.set_volume(.1)
+
     def update(self, surface, paused):
         if not self.dead:
             # determine delta time
@@ -227,9 +236,11 @@ class Player:
                 entity.collect()
                 if entity.name == 'gold':
                     self.gold_count += 1
+                    self.pickup_coin_sound.play()
                 elif entity.name == 'mana':
                     if self.mana_count < self.max_mana:
                         self.mana_count += 1
+                    self.pickup_mana_sound.play()
 
     def check_ghost_state(self):
         self.ghost_count += 1 * self.dt
@@ -301,6 +312,7 @@ class Player:
                     self.jump_rotation = 0
                     self.jump_spin_done = False
                     self.add_jump_particles()
+                    self.jump_sound.play()
             else:
                 self.jump_count -= 1
                 self.dy = -self.jump_vel
@@ -308,6 +320,7 @@ class Player:
                 self.jump_rotation = 0
                 self.jump_spin_done = False
                 self.add_jump_particles()
+                self.jump_sound.play()
 
     def hit(self):
         if not self.godmode:

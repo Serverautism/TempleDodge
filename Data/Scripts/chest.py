@@ -47,6 +47,12 @@ class Chest:
         self.open_particle_ammount = 60
         self.death_particle_ammount = 60
 
+        self.crush_sound = pygame.mixer.Sound('Data/Assets/Sound/Sfx/chest_crush_1.wav')
+        self.crush_sound.set_volume(.1)
+
+        self.open_sound = pygame.mixer.Sound('Data/Assets/Sound/Sfx/chest_open_1.wav')
+        self.open_sound.set_volume(.1)
+
     def update(self, surface,  all_rocks):
         if not self.crushed:
             # determine delta time
@@ -75,6 +81,7 @@ class Chest:
     def open(self):
         if not self.opened and not self.crushed:
             self.opened = True
+            self.open_sound.play()
             self.add_open_particles()
 
             for i in range(self.drop_count):
@@ -83,6 +90,7 @@ class Chest:
 
     def crush(self):
         self.crushed = True
+        self.crush_sound.play()
 
         if not self.opened:
             self.add_death_particles(5)
