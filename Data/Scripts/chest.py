@@ -19,7 +19,12 @@ class Chest:
         self.open_image = pygame.image.load(f'Data/Assets/sprites/Chest/chest_{self.name}_2.png').convert_alpha()
         self.rect = self.closed_image.get_rect()
         self.rect.bottom = self.rock.rect.top
-        self.rect.x = self.rock.rect.x
+
+        if self.rock.width == 1:
+            self.rect.x = self.rock.rect.x
+        elif self.rock.width == 2:
+            self.rect.centerx = self.rock.rect.centerx
+
         self.opened = False
         self.crushed = False
         self.done = False

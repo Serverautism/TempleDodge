@@ -77,7 +77,7 @@ class Game:
         self.clock = pygame.time.Clock()
         self.render_surface = pygame.Surface(self.render_dimensions).convert_alpha()
         self.render_surface.set_colorkey(colors.black)
-        self.rock_handler = rock_handler.RockHandler(5, 0)
+        self.rock_handler = rock_handler.RockHandler(5)
         self.bullet_handler = bullet_handler.BulletHandler(1, 5, 20, 10)
         self.player = player.Player(self.player_spawn, self.rock_handler.landed_rocks, self.rock_handler.falling_rocks, self.rock_handler.chests, self.items, self.bullet_handler.bullets)
         self.hud = hud.Hud(self.player)
@@ -87,6 +87,7 @@ class Game:
 
         # images
         self.background_rect_image = pygame.image.load("Data/Assets/Sprites/Background/rect.png").convert_alpha()
+        self.background_rect_shadow_image = pygame.image.load("Data/Assets/Sprites/Background/rect_shadow.png").convert_alpha()
 
         self.map_shadow_image_l_20_0 = pygame.image.load("Data/Assets/Sprites/Map/wallshadow_l_20_1.png").convert_alpha()
         self.map_shadow_image_l_20_1 = pygame.image.load("Data/Assets/Sprites/Map/wallshadow_l_20_2.png").convert_alpha()
@@ -258,25 +259,26 @@ class Game:
 
         # rects
         for rect in self.background_rects:
-            render = pygame.transform.rotate(rect[0], rect[3])
+            render = pygame.transform.rotate(rect[0], rect[4])
+            shadow_render = pygame.transform.rotate(rect[1], rect[4])
 
-            rect[1][1] += self.background_rects_speed * self.dt
-            if rect[3] > 0:
-                rect[3] += self.background_rects_rotation_speed * self.dt
-            elif rect[3] < 0:
-                rect[3] -= self.background_rects_rotation_speed * self.dt
+            rect[2][1] += self.background_rects_speed * self.dt
+            if rect[4] > 0:
+                rect[4] += self.background_rects_rotation_speed * self.dt
+            elif rect[4] < 0:
+                rect[4] -= self.background_rects_rotation_speed * self.dt
 
             # move rect if off screen
-            if self.background_rects_speed > 0 and rect[1][1] - render.get_height() / 2 > self.render_height:
-                min_y = min([i[1][1] for i in self.background_rects if i[1][0] == rect[1][0]])
-                rect[1][1] = min_y - self.render_height / 3
-            elif self.background_rects_speed < 0 and rect[1][1] + render.get_height() / 2 < 0:
-                max_y = max([i[1][1] for i in self.background_rects if i[1][0] == rect[1][0]])
-                rect[1][1] = max_y + self.render_height / 3
+            if self.background_rects_speed > 0 and rect[2][1] - render.get_height() / 2 > self.render_height:
+                min_y = min([i[2][1] for i in self.background_rects if i[2][0] == rect[2][0]])
+                rect[2][1] = min_y - self.render_height / 3
+            elif self.background_rects_speed < 0 and rect[2][1] + render.get_height() / 2 < 0:
+                max_y = max([i[2][1] for i in self.background_rects if i[2][0] == rect[2][0]])
+                rect[2][1] = max_y + self.render_height / 3
 
-            render_x = rect[1][0] - render.get_width() / 2
-            render_y = rect[1][1] - render.get_height() / 2
-            surface.blit(render, (round(render_x) - 5, round(render_y) + 5), special_flags=pygame.BLEND_RGB_SUB)
+            render_x = rect[2][0] - render.get_width() / 2
+            render_y = rect[2][1] - render.get_height() / 2
+            surface.blit(shadow_render, (round(render_x) - 5, round(render_y) + 5))
             surface.blit(render, (round(render_x), round(render_y)))
 
         # lines
@@ -442,6 +444,7 @@ class Game:
             size = random.randint(self.background_rects_min_size, self.background_rects_max_size)
             rotation = random.randint(-180, 180)
             image = pygame.transform.scale(self.background_rect_image, (size, size)).convert_alpha()
+            shadow_image = pygame.transform.scale(self.background_rect_shadow_image, (size, size)).convert_alpha()
 
             if i < 5:
                 y = (i + 1) * (self.render_height / 3)
@@ -453,7 +456,7 @@ class Game:
                 y = (i - 10 + 1.6) * self.render_height / 3
                 x = (self.render_width / 4) * 3
 
-            rects.append([image, [x, y], size, rotation])
+            rects.append([image, shadow_image, [x, y], size, rotation])
         return rects
 
     def prepare_new_round(self):

@@ -55,6 +55,9 @@ class Item:
         self.dt = 0
         self.last_time = time.time()
 
+        self.crush_sound = pygame.mixer.Sound('Data/Assets/Sound/Sfx/item_crush_1.wav')
+        self.crush_sound.set_volume(.1)
+
     def update(self, surface, paused):
         # calculate delta time
         self.dt = time.time() - self.last_time
@@ -120,6 +123,7 @@ class Item:
         for entity in falling_rock_hit_list:
             if self.rect.y >= entity.rect.y:
                 self.collected = True
+                self.crush_sound.play()
             else:
                 self.center[1] -= self.velocity[1] * self.dt
                 self.rect.centery = self.center[1]

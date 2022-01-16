@@ -112,6 +112,9 @@ class Player:
         self.jump_sound = pygame.mixer.Sound('Data/Assets/Sound/Sfx/jump_1.wav')
         self.jump_sound.set_volume(.1)
 
+        self.hit_sound = pygame.mixer.Sound('Data/Assets/Sound/Sfx/hit_1.wav')
+        self.hit_sound.set_volume(.1)
+
         self.pickup_coin_sound = pygame.mixer.Sound('Data/Assets/Sound/Sfx/pickup_coin_1.wav')
         self.pickup_coin_sound.set_volume(.1)
 
@@ -325,6 +328,7 @@ class Player:
     def hit(self):
         if not self.godmode:
             self.dead = True
+            self.hit_sound.play()
             self.add_death_particles()
 
     def get_image(self):

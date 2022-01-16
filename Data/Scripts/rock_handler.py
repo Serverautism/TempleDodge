@@ -10,7 +10,7 @@ from . import funcs
 
 
 class RockHandler:
-    def __init__(self, rocks_per_second, rocks_per_second_change):
+    def __init__(self, rocks_per_second):
         self.landed_map_default = [
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -36,6 +36,8 @@ class RockHandler:
         self.time_since_last_spawn = 0
         self.rocks_per_second = rocks_per_second
         self.spawn_time = 60 / self.rocks_per_second
+        self.time_since_last_wide_spawn = 0
+        self.wide_spawn_time = 5
         self.pushed_down_counter = 0
         self.max_collum_difference = 4
 
@@ -64,8 +66,8 @@ class RockHandler:
         # unblock blocked collums
         to_remove = []
         for row in self.blocked_rows:
-            row[1] -= 1
-            if row[1] == 0:
+            row[1] -= 1 * self.dt
+            if row[1] <= 0:
                 self.available_rows.append(row[0])
                 to_remove.append(row)
 
@@ -76,8 +78,8 @@ class RockHandler:
         if not paused:
             self.time_since_last_spawn += 1 * self.dt
             if spawn_rocks and self.time_since_last_spawn >= self.spawn_time:
-                rows_min_index = self.row_counter.index(min(self.row_counter))
                 self.time_since_last_spawn = 0
+                rows_min_index = self.row_counter.index(min(self.row_counter))
 
                 # choose a spawn
                 x = random.choice(self.available_rows)
@@ -94,14 +96,60 @@ class RockHandler:
                     self.available_rows.remove(index)
                     self.blocked_rows.append([index, self.row_block_time])
 
-                # choose a row
+                # block spawn
                 self.available_rows.remove(x)
                 self.blocked_rows.append([x, self.row_block_time])
 
-                self.row_counter[x - 1] += 1
-                pos = funcs.grid_pos_to_render_pos((x, -1))
-                new_rock = rock.Rock(pos, self.rock_speed, False)
-                self.falling_rocks.append(new_rock)
+                # spawn wide rock
+                self.time_since_last_wide_spawn += 1 * self.dt
+                if self.time_since_last_wide_spawn >= self.wide_spawn_time:
+
+                    # if left from spawn is same hight
+                    if x > 1 and self.row_counter[x - 1] == self.row_counter[x - 2] and x - 1 in self.available_rows:
+                        self.row_counter[x - 2] += 1
+                        self.row_counter[x - 1] += 1
+
+                        pos = funcs.grid_pos_to_render_pos((x - 1, -1))
+                        new_rock = rock.Rock(pos, self.rock_speed, False, 2)
+
+                        self.falling_rocks.append(new_rock)
+
+                        self.available_rows.remove(x - 1)
+                        self.blocked_rows.append([x - 1, self.row_block_time])
+
+                        self.time_since_last_wide_spawn = 0
+
+                    # if right from spawn is same hight
+                    elif x < 30 and self.row_counter[x - 1] == self.row_counter[x] and x + 1 in self.available_rows:
+                        self.row_counter[x - 1] += 1
+                        self.row_counter[x] += 1
+
+                        pos = funcs.grid_pos_to_render_pos((x, -1))
+                        new_rock = rock.Rock(pos, self.rock_speed, False, 2)
+
+                        self.falling_rocks.append(new_rock)
+
+                        self.available_rows.remove(x + 1)
+                        self.blocked_rows.append([x + 1, self.row_block_time])
+
+                        self.time_since_last_wide_spawn = 0
+
+                    else:
+                        self.row_counter[x - 1] += 1
+
+                        pos = funcs.grid_pos_to_render_pos((x, -1))
+                        new_rock = rock.Rock(pos, self.rock_speed, False)
+
+                        self.falling_rocks.append(new_rock)
+
+                else:
+                    self.row_counter[x - 1] += 1
+
+                    pos = funcs.grid_pos_to_render_pos((x, -1))
+                    new_rock = rock.Rock(pos, self.rock_speed, False)
+
+                    self.falling_rocks.append(new_rock)
+
                 # spawn chest
                 if random.randint(1, 10) == 1:
                     self.chests.append(chest.Chest(new_rock, random.choice(['gold', 'mana']), self.landed_rocks, self.falling_rocks))
@@ -124,6 +172,9 @@ class RockHandler:
                 to_move.append(entity)
                 collum, row = funcs.render_pos_to_grid_pos((entity.rect.x, entity.rect.y - self.pushed_down_counter))
                 self.map_of_landed_rocks[int(row)][int(collum) - 1] = 1
+
+                if entity.width == 2:
+                    self.map_of_landed_rocks[int(row)][int(collum)] = 1
 
         for entity in to_move:
             self.falling_rocks.remove(entity)
