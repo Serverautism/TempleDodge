@@ -38,8 +38,10 @@ class RockHandler:
         self.spawn_time = 60 / self.rocks_per_second
         self.time_since_last_wide_spawn = 0
         self.wide_spawn_time = 5
-        self.pushed_down_counter = 0
         self.max_collum_difference = 4
+
+        self.move_landed_rocks_down = False
+        self.pushed_down_counter = 0
 
         self.falling_rocks = []
         self.landed_rocks = []
@@ -110,7 +112,7 @@ class RockHandler:
                         self.row_counter[x - 1] += 1
 
                         pos = funcs.grid_pos_to_render_pos((x - 1, -1))
-                        new_rock = rock.Rock(pos, self.rock_speed, False, 2)
+                        new_rock = rock.Rock(pos, self.rock_speed, False, self.landed_rocks, 2)
 
                         self.falling_rocks.append(new_rock)
 
@@ -125,7 +127,7 @@ class RockHandler:
                         self.row_counter[x] += 1
 
                         pos = funcs.grid_pos_to_render_pos((x, -1))
-                        new_rock = rock.Rock(pos, self.rock_speed, False, 2)
+                        new_rock = rock.Rock(pos, self.rock_speed, False, self.landed_rocks, 2)
 
                         self.falling_rocks.append(new_rock)
 
@@ -138,7 +140,7 @@ class RockHandler:
                         self.row_counter[x - 1] += 1
 
                         pos = funcs.grid_pos_to_render_pos((x, -1))
-                        new_rock = rock.Rock(pos, self.rock_speed, False)
+                        new_rock = rock.Rock(pos, self.rock_speed, False, self.landed_rocks)
 
                         self.falling_rocks.append(new_rock)
 
@@ -146,7 +148,7 @@ class RockHandler:
                     self.row_counter[x - 1] += 1
 
                     pos = funcs.grid_pos_to_render_pos((x, -1))
-                    new_rock = rock.Rock(pos, self.rock_speed, False)
+                    new_rock = rock.Rock(pos, self.rock_speed, False, self.landed_rocks)
 
                     self.falling_rocks.append(new_rock)
 
@@ -155,11 +157,26 @@ class RockHandler:
                     self.chests.append(chest.Chest(new_rock, random.choice(['gold', 'mana']), self.landed_rocks, self.falling_rocks))
 
         # handle landed rocks
+        if self.move_landed_rocks_down:
+            if self.pushed_down_counter < 16:
+                for entity in self.landed_rocks:
+                    entity.move_down(1)
+                self.pushed_down_counter += 1
+            else:
+                self.move_landed_rocks_down = False
+                self.pushed_down_counter = 0
+                for i in range(-1, -len(self.map_of_landed_rocks), -1):
+                    self.map_of_landed_rocks[i] = self.map_of_landed_rocks[i - 1].copy()
+                self.map_of_landed_rocks[0] = self.landed_map_default[0].copy()
+                for i in range(len(self.row_counter)):
+                    self.row_counter[i] -= 1
+
         to_remove = []
         for entity in self.landed_rocks:
-            entity.update(surface, paused)
-            if entity.rect.y > 288:
+            if entity.rect.y > 287:
                 to_remove.append(entity)
+            else:
+                entity.update(surface, paused)
 
         for entity in to_remove:
             self.landed_rocks.remove(entity)
@@ -167,7 +184,7 @@ class RockHandler:
         # handle falling rocks
         to_move = []
         for entity in self.falling_rocks:
-            entity.update(surface, paused, self.landed_rocks)
+            entity.update(surface, paused)
             if entity.landed:
                 to_move.append(entity)
                 collum, row = funcs.render_pos_to_grid_pos((entity.rect.x, entity.rect.y - self.pushed_down_counter))
@@ -176,24 +193,14 @@ class RockHandler:
                 if entity.width == 2:
                     self.map_of_landed_rocks[int(row)][int(collum)] = 1
 
+                # tetris check
+                if not paused and entity.rect.y == 256:
+                    if sum(self.map_of_landed_rocks[-2]) == 30:
+                        self.move_landed_rocks_down = True
+
         for entity in to_move:
             self.falling_rocks.remove(entity)
             self.landed_rocks.append(entity)
-
-        # tetris check
-        if not paused:
-            if sum(self.map_of_landed_rocks[-2][:30]) == 30:
-                if self.pushed_down_counter < 16:
-                    for entity in self.landed_rocks:
-                        entity.move_down(1)
-                    self.pushed_down_counter += 1
-                else:
-                    self.pushed_down_counter = 0
-                    for i in range(-1, -len(self.map_of_landed_rocks), -1):
-                        self.map_of_landed_rocks[i] = self.map_of_landed_rocks[i - 1].copy()
-                    self.map_of_landed_rocks[0] = self.landed_map_default[0].copy()
-                    for i in range(len(self.row_counter)):
-                        self.row_counter[i] -= 1
 
     def update_particles(self, surface):
         for entity in self.falling_rocks + self.landed_rocks:
@@ -202,7 +209,7 @@ class RockHandler:
     def generate_landed_rocks(self):
         for i in range(1, 31):
             x, y = funcs.grid_pos_to_render_pos((i, 17))
-            self.landed_rocks.append(rock.Rock((x, y), self.rock_speed, True))
+            self.landed_rocks.append(rock.Rock((x, y), self.rock_speed, True, self.landed_rocks))
 
     def reset(self):
         self.time_since_last_spawn = 0

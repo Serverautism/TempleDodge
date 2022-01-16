@@ -178,7 +178,7 @@ class Game:
             self.bullet_handler.update_particles(self.screen)
 
             # update screen
-            pygame.display.update()
+            pygame.display.flip()
 
     def handle_input(self):
         for event in pygame.event.get():

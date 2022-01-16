@@ -8,10 +8,11 @@ from . import funcs
 
 
 class Rock:
-    def __init__(self, render_pos, speed, landed, width: int = 1):
+    def __init__(self, render_pos, speed, landed, landed_rocks, width: int = 1):
         self.x, self.y = render_pos
         self.speed = speed
         self.landed = landed
+        self.landed_rocks = landed_rocks
 
         self.width = width
 
@@ -35,7 +36,7 @@ class Rock:
         self.particle_color = (226, 156, 255)
         self.particle_glow_color = (6, 0, 8)
 
-    def update(self, surface, paused, landed_rocks=None):
+    def update(self, surface, paused):
         if not self.landed and not paused:
             # determine delta time
             self.dt = time.time() - self.last_time
@@ -44,11 +45,12 @@ class Rock:
 
             self.y += self.speed * self.dt
             self.rect.y = self.y
-            for entity in landed_rocks:
-                if self.rect.colliderect(entity.rect):
-                    self.rect.bottom = entity.rect.top
-                    self.y = self.rect.top
-                    self.landed = True
+            for entity in self.landed_rocks:
+                if entity.rect.x <= self.rect.x <= entity.rect.right:
+                    if self.rect.colliderect(entity.rect):
+                        self.rect.bottom = entity.rect.top
+                        self.y = self.rect.top
+                        self.landed = True
 
         surface.blit(self.image, self.rect)
 
