@@ -13,7 +13,8 @@ class Game:
 
         # bool
         self.running = True
-        self.paused = False
+        self.paused = True
+        self.first_time = True
         self.checked_for_new_highscore = False
         self.new_highscore = False
 
@@ -188,7 +189,13 @@ class Game:
             # keypresses
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    self.player.jump()
+                    if self.paused:
+                        if self.first_time:
+                            self.first_time = False
+                            self.paused = False
+                            self.hud.first_time = False
+                    else:
+                        self.player.jump()
                 elif event.key == pygame.K_f:
                     self.player.enable_ghost_mode()
                 elif event.key == pygame.K_ESCAPE:

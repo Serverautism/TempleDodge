@@ -37,12 +37,12 @@ class Rock:
         self.particle_glow_color = (6, 0, 8)
 
     def update(self, surface, paused):
-        if not self.landed and not paused:
-            # determine delta time
-            self.dt = time.time() - self.last_time
-            self.dt *= 60
-            self.last_time = time.time()
+        # determine delta time
+        self.dt = time.time() - self.last_time
+        self.dt *= 60
+        self.last_time = time.time()
 
+        if not self.landed and not paused:
             self.y += self.speed * self.dt
             self.rect.y = self.y
             for entity in self.landed_rocks:

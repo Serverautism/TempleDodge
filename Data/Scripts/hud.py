@@ -10,6 +10,8 @@ class Hud:
     def __init__(self, player):
         self.render_width = 512
         self.render_height = 288
+
+        self.first_time = True
         
         self.gold_font_color = colors.gold_font
 
@@ -21,6 +23,12 @@ class Hud:
         self.last_mana_count = self.player.mana_count
         self.last_gold_count = self.player.gold_count
 
+        self.startup_text = 'press SPACE to play'
+        self.space_icon = pygame.image.load('Data/Assets/Sprites/Gui/space_icon.png').convert_alpha()
+        self.startup_render = self.render_startup()
+        self.startup_render_x = self.render_width / 2 - self.startup_render.get_width() / 2
+        self.startup_render_y = self.render_height / 2 - self.startup_render.get_height() / 2
+
         self.paused_icon = pygame.image.load('Data/Assets/Sprites/Gui/paused_icon.png').convert_alpha()
         self.paused_text = 'press ESCAPE to resume'
         self.paused_render = self.render_paused()
@@ -29,6 +37,7 @@ class Hud:
 
         self.r_icon = pygame.image.load('Data/Assets/Sprites/Gui/r_icon.png')
         self.new_highscore_text = 'NEW HIGHSCORE'
+        self.replay_text = 'press R to play again'
         self.new_highscore_render = self.new_highscore_font.render(self.new_highscore_text, True, colors.font_color)
         self.new_highscore_direction = 'R'
         self.new_highscore_rotation = 0
@@ -100,7 +109,10 @@ class Hud:
         surface.blit(self.render_surface, (0, 0))
 
         if paused:
-            self.display_paused(surface)
+            if self.first_time:
+                self.display_startup(surface)
+            else:
+                self.display_paused(surface)
 
     def display_dead(self, surface, new_highscore):
         self.draw_text_background(surface)
@@ -131,8 +143,7 @@ class Hud:
         self.score_text_render_x = self.render_width / 2 - self.score_text_render.get_width() / 2
         self.score_text_render_y = self.render_height / 2 - self.score_text_render.get_height() / 2
 
-        replay_text = 'press R to play again'
-        self.replay_text_render = self.font.render(replay_text, True, colors.font_color)
+        self.replay_text_render = self.font.render(self.replay_text, True, colors.font_color)
         self.r_icon_y = self.score_text_render_y + 10
         self.replay_text_render_x = self.render_width / 2 - self.replay_text_render.get_width() / 2
         self.r_icon_x = self.replay_text_render_x - self.r_icon.get_width() - 10
@@ -165,6 +176,24 @@ class Hud:
 
         render_surface.blit(self.paused_icon, (0, 0))
         render_surface.blit(textrender, (self.paused_icon.get_width() + 10, 5))
+
+        return render_surface
+
+    def display_startup(self, surface):
+        self.draw_text_background(surface)
+
+        surface.blit(self.startup_render, (self.startup_render_x, self.startup_render_y))
+
+    def render_startup(self):
+        textrender = self.font.render(self.startup_text, True, colors.font_color)
+
+        width = textrender.get_width() + self.space_icon.get_width() + 10
+        height = self.space_icon.get_height()
+        render_surface = pygame.Surface((width, height))
+        render_surface.set_colorkey((0, 0, 0))
+
+        render_surface.blit(self.space_icon, (0, 0))
+        render_surface.blit(textrender, (self.space_icon.get_width() + 10, 5))
 
         return render_surface
 
