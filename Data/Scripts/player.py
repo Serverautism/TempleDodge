@@ -48,7 +48,7 @@ class Player:
         self.ghost_speed = 2
         self.ghost_duration_time = 10
         self.ghost_count = 0
-        self.godmode = True
+        self.godmode = False
         self.dead = False
 
         self.left_border_rect = pygame.rect.Rect(0, 0, 16, 288)
@@ -91,7 +91,7 @@ class Player:
         self.glow_grow = True
 
         self.gold_count = 0
-        self.mana_count = 7
+        self.mana_count = 0
         self.max_mana = 7
 
         self.particles = []
