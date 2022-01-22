@@ -284,7 +284,7 @@ class Game:
             # update it and get all the items in our list
             # or move the chest to the ones that needs to be removed
             if not entity.done:
-                entity.update(surface, self.rock_handler.falling_rocks)
+                entity.update(surface)
 
                 if entity.opened and len(entity.items) > 0:
                     self.items += entity.items
