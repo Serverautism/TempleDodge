@@ -213,7 +213,7 @@ class Player:
             self.rect.x = self.x
 
         # same for the falling rocks
-        falling_rock_hit_list = pygame.sprite.spritecollide(self, self.falling_rocks, False, pygame.sprite.collide_mask)
+        falling_rock_hit_list = pygame.sprite.spritecollide(self, self.falling_rocks, False)
         if len(falling_rock_hit_list) > 0:
             self.x -= self.dx * self.dt
             self.rect.x = self.x
