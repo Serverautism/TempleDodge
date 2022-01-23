@@ -99,9 +99,9 @@ class BulletHandler:
         self.bullets.append(bullet.Bullet(velocity, position, wall_number))
 
     # update the particles every bullet if holding
-    def update_particles(self, surface):
+    def update_particles(self, surface, paused, dead, no_particle_rect):
         for entity in self.bullets:
-            entity.update_particles(surface)
+            entity.update_particles(surface, paused, dead, no_particle_rect)
 
     # reset some parameters before starting a new round
     # for example delete all bullets

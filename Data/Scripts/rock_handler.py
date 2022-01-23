@@ -236,9 +236,9 @@ class RockHandler:
             self.landed_rocks.append(entity)
 
     # calls the update particle function on every rock
-    def update_particles(self, surface):
+    def update_particles(self, surface, paused, dead, no_particle_rect):
         for entity in self.falling_rocks + self.landed_rocks:
-            entity.update_particles(surface)
+            entity.update_particles(surface, paused, dead, no_particle_rect)
 
     # generates the bottom row of rocks at the start of every round
     def generate_landed_rocks(self):

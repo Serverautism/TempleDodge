@@ -197,7 +197,7 @@ class Item:
             self.mask = pygame.mask.from_surface(self.image)
 
     # this function updates and spawns the particles
-    def update_particles(self, surface):
+    def update_particles(self, surface, paused, dead, no_particle_rect):
         # spawn particle if its the time to do so
         self.move_particle_count += 1 * self.dt
         if self.move_particle_count >= self.move_particle_time:
@@ -219,7 +219,11 @@ class Item:
             if entity.dead:
                 to_remove.append(entity)
             else:
-                entity.update(surface)
+                # do not draw the particle onto a hud message
+                if paused or dead:
+                    entity.update(surface, no_particle_rect)
+                else:
+                    entity.update(surface)
 
         for entity in to_remove:
             self.particles.remove(entity)

@@ -180,7 +180,7 @@ class Bullet:
         surface.blit(self.sparkle_image, (self.render_x, self.render_y))
 
     # updates the particles for the bullets particle trail
-    def update_particles(self, surface):
+    def update_particles(self, surface, paused, dead, no_particle_rect):
         # spawn particle if its time to do so
         self.move_particle_count += 1 * self.dt
         if self.move_particle_count >= self.move_particle_time:
@@ -203,7 +203,11 @@ class Bullet:
             if entity.dead:
                 to_remove.append(entity)
             else:
-                entity.update(surface)
+                # do not draw the particle onto a hud message
+                if paused or dead:
+                    entity.update(surface, no_particle_rect)
+                else:
+                    entity.update(surface)
 
         # ...remove them from the list
         for entity in to_remove:

@@ -5,7 +5,7 @@ import time
 
 import pygame
 
-from Data.Scripts import colors, rock_handler, bullet_handler, player, hud
+from Data.Scripts import colors, rock_handler, bullet_handler, player, hud, funcs
 
 
 # Game object:
@@ -104,6 +104,11 @@ class Game:
         # render surface will hold the original frame
         self.render_surface = pygame.Surface(self.render_dimensions).convert_alpha()
         self.render_surface.set_colorkey(colors.black)
+
+        # rect where no particles should be drawn while the hud shows a message
+        topleft = funcs.render_pos_to_screen_pos((108, 64), self.screen_dimensions)
+        bottomright = funcs.render_pos_to_screen_pos((404, 224), self.screen_dimensions)
+        self.no_particle_rect = pygame.Rect(topleft, (bottomright[0] - topleft[0], bottomright[1] - topleft[1]))
 
         # handles all the stone blocks that fall down in game
         self.rock_handler = rock_handler.RockHandler(5)
@@ -216,11 +221,11 @@ class Game:
             # now draw all the particle object that every player and rock etc. hold
             # they do not get drawn onto the screen and not the render surface to look smaller
             # because they do not get scaled
-            self.rock_handler.update_particles(self.screen)
-            self.player.update_particles(self.screen)
+            self.rock_handler.update_particles(self.screen, self.paused, self.player.dead, self.no_particle_rect)
+            self.player.update_particles(self.screen, self.paused, self.no_particle_rect)
             self.update_item_particles(self.screen)
             self.update_chest_particles(self.screen)
-            self.bullet_handler.update_particles(self.screen)
+            self.bullet_handler.update_particles(self.screen, self.paused, self.player.dead, self.no_particle_rect)
 
             # at the end update the screen to show the changes
             pygame.display.flip()
@@ -313,12 +318,12 @@ class Game:
     # update all particles from out items
     def update_item_particles(self, surface):
         for entity in self.items:
-            entity.update_particles(surface)
+            entity.update_particles(surface, self.paused, self.player.dead, self.no_particle_rect)
 
     # same for the chests
     def update_chest_particles(self, surface):
         for entity in self.chests:
-            entity.update_particles(surface)
+            entity.update_particles(surface, self.paused, self.player.dead, self.no_particle_rect)
 
     # draws the background rects and lines
     def draw_background(self, surface):

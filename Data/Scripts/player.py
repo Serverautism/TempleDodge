@@ -527,7 +527,7 @@ class Player:
             self.particles.append(p)
 
     # updates all of the particles and spawns the particles for the player particle trail
-    def update_particles(self, surface):
+    def update_particles(self, surface, paused, no_particle_rect):
         # spawn a particle if its time to do so
         if self.dx != 0 or self.dy != 0:
             self.move_particle_count += 1 * self.dt
@@ -550,7 +550,11 @@ class Player:
             if entity.dead:
                 to_remove.append(entity)
             else:
-                entity.update(surface)
+                # do not draw the particle onto a hud message
+                if paused or self.dead:
+                    entity.update(surface, no_particle_rect)
+                else:
+                    entity.update(surface)
 
         for entity in to_remove:
             self.particles.remove(entity)

@@ -44,7 +44,7 @@ class Particle:
             self.radius_change = self.radius / self.lifetime
 
     # main update function
-    def update(self, surface):
+    def update(self, surface, no_draw=None):
         # calculate the delta time since the last frame
         self.dt = time.time() - self.last_time
         self.dt *= 60
@@ -53,8 +53,6 @@ class Particle:
         # change position based on velocity and the time passed
         self.center[0] += self.velocity[0] * self.dt
         self.center[1] += self.velocity[1] * self.dt
-
-        # interact with rocks
 
         # apply gravity to the movement on the y-axis
         self.velocity[1] += self.gravity * self.dt
@@ -72,18 +70,21 @@ class Particle:
             if self.lifetime <= 0:
                 self.dead = True
 
-        # if the particle has glow enabled
-        if self.has_glow:
-            # we draw the pre rendered image for static sizes
-            if self.static_size:
-                surface.blit(self.glow_image, (int(self.center[0]) - int(self.radius * self.glow_scale), int(self.center[1]) - int(self.radius * self.glow_scale)), special_flags=pygame.BLEND_RGB_ADD)
+        # if there is not rect where no particles should be visible
+        # or the particle is not in the rect
+        if no_draw is None or not no_draw.collidepoint(self.center):
+            # if the particle has glow enabled
+            if self.has_glow:
+                # we draw the pre rendered image for static sizes
+                if self.static_size:
+                    surface.blit(self.glow_image, (int(self.center[0]) - int(self.radius * self.glow_scale), int(self.center[1]) - int(self.radius * self.glow_scale)), special_flags=pygame.BLEND_RGB_ADD)
 
-            # or generate a new glow image with the changed radius
-            else:
-                surface.blit(self.get_glow(), (int(self.center[0]) - int(self.radius * self.glow_scale), int(self.center[1]) - int(self.radius * self.glow_scale)), special_flags=pygame.BLEND_RGB_ADD)
+                # or generate a new glow image with the changed radius
+                else:
+                    surface.blit(self.get_glow(), (int(self.center[0]) - int(self.radius * self.glow_scale), int(self.center[1]) - int(self.radius * self.glow_scale)), special_flags=pygame.BLEND_RGB_ADD)
 
-        # draw the particle
-        pygame.draw.circle(surface, self.color, [int(self.center[0]), int(self.center[1])], int(self.radius))
+            # draw the particle
+            pygame.draw.circle(surface, self.color, [int(self.center[0]), int(self.center[1])], int(self.radius))
 
     # renders the glow
     def get_glow(self):

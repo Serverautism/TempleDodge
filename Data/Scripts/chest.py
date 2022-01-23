@@ -160,14 +160,18 @@ class Chest:
             self.particles.append(p)
 
     # update particle function
-    def update_particles(self, surface):
+    def update_particles(self, surface, paused, dead, no_particle_rect):
         # remove particles if they are dead or update them
         to_remove = []
         for entity in self.particles:
             if entity.dead:
                 to_remove.append(entity)
             else:
-                entity.update(surface)
+                # do not draw the particle onto a hud message
+                if paused or dead:
+                    entity.update(surface, no_particle_rect)
+                else:
+                    entity.update(surface)
 
         for entity in to_remove:
             self.particles.remove(entity)
