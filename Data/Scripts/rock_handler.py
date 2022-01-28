@@ -59,22 +59,22 @@ class RockHandler:
         self.dt *= 60
         self.last_time = time.time()
 
-        # unblock blocked columns by subtracting the time its blocked for and unblock it if the time is up
-        to_remove = []
-        for column in self.blocked_columns:
-            column[1] -= 1 * self.dt
-            if column[1] <= 0:
-                # add the index to the available ones
-                self.available_columns.append(column[0])
-                to_remove.append(column)
-
-        # remove the index from the blocked ones
-        for column in to_remove:
-            self.blocked_columns.remove(column)
-
         # spawn rocks if the game is not paused
         if not paused:
-            # check if its time so span a rock
+            # unblock blocked columns by subtracting the time its blocked for and unblock it if the time is up
+            to_remove = []
+            for column in self.blocked_columns:
+                column[1] -= 1 * self.dt
+                if column[1] <= 0:
+                    # add the index to the available ones
+                    self.available_columns.append(column[0])
+                    to_remove.append(column)
+
+            # remove the index from the blocked ones
+            for column in to_remove:
+                self.blocked_columns.remove(column)
+
+            # check if its time so spawn a rock
             self.time_since_last_spawn += 1 * self.dt
             if spawn_rocks and self.time_since_last_spawn >= self.spawn_time:
                 self.time_since_last_spawn = 0
@@ -217,15 +217,16 @@ class RockHandler:
                 to_move.append(entity)
 
                 # translate their position to the position in the grid and set the position to 1 in the map of the landed rocks
-                column, column = funcs.render_pos_to_grid_pos((entity.rect.x, entity.rect.y - self.pushed_down_counter))
-                self.map_of_landed_rocks[int(column)][int(column) - 1] = 1
+                column, row = funcs.render_pos_to_grid_pos((entity.rect.x, entity.rect.y - self.pushed_down_counter))
+                self.map_of_landed_rocks[int(row)][int(column) - 1] = 1
 
                 # if the rock if wider, set the position at the right side of the rock to 1 as well
                 if entity.width == 2:
-                    self.map_of_landed_rocks[int(column)][int(column)] = 1
+                    self.map_of_landed_rocks[int(row)][int(column)] = 1
 
                 # check if the 2 row of rocks from the bottom is 'completed', meaning it is filled with 30 rocks
                 if not paused and entity.rect.y == 256:
+                    print(self.map_of_landed_rocks[-2])
                     if sum(self.map_of_landed_rocks[-2]) == 30:
                         # if it is save that information to start moving down the landed rocks
                         self.move_landed_rocks_down = True

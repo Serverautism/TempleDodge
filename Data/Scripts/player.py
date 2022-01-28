@@ -67,7 +67,7 @@ class Player:
         self.ghost_count = 0
 
         # god mode prevents the player from dying
-        self.godmode = False
+        self.godmode = True
         self.dead = False
 
         # create a map border object for the collision

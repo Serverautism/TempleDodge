@@ -15,6 +15,9 @@ class Game:
         # init pygame before using it
         pygame.init()
 
+        # hide mouse
+        pygame.mouse.set_visible(False)
+
         self.running = True
         self.paused = True
         self.first_time = True
