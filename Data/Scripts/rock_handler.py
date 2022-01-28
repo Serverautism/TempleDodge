@@ -226,7 +226,6 @@ class RockHandler:
 
                 # check if the 2 row of rocks from the bottom is 'completed', meaning it is filled with 30 rocks
                 if not paused and entity.rect.y == 256:
-                    print(self.map_of_landed_rocks[-2])
                     if sum(self.map_of_landed_rocks[-2]) == 30:
                         # if it is save that information to start moving down the landed rocks
                         self.move_landed_rocks_down = True
