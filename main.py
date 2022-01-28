@@ -189,12 +189,19 @@ class Game:
             # clock keeps the game from overshoot the fps
             self.clock.tick(self.fps)
             #print(self.clock.get_fps())
+
             # determine delta time which is mostly used with movement to compensate slower fps
             self.dt = time.time() - self.last_time
             self.dt *= 60
             self.last_time = time.time()
-            # handle all keypresses
+
+            # prevent game braking low fps
+            if self.dt > 16:
+                raise RuntimeWarning("FPS fallen below playable limit")
+
+            # handle all key presses
             self.handle_input()
+
             # draw the background
             self.draw_background(self.render_surface)
 
