@@ -67,7 +67,7 @@ class Player:
         self.ghost_count = 0
 
         # god mode prevents the player from dying
-        self.godmode = True
+        self.godmode = False
         self.dead = False
 
         # create a map border object for the collision
@@ -117,7 +117,7 @@ class Player:
 
         # counts for the items
         self.gold_count = 0
-        self.mana_count = 7
+        self.mana_count = 0
         self.max_mana = 7
 
         self.particles = []
