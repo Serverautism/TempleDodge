@@ -373,10 +373,14 @@ class Game:
             surface.blit(render, (round(render_x), round(render_y)))
 
         # draw the lines on top of the rects
+        # first tilt the lines matching the players position in relation to the screens center
+        self.background_lines_yoffset = (self.player.rect.x - self.render_width / 2) / 3
+
+        # update and draw each line
         for line in self.background_lines:
             # move the lines start and endpoints y position
             line[0][1] += self.background_lines_speed * self.dt
-            line[1][1] += self.background_lines_speed * self.dt
+            line[1][1] = line[0][1] + self.background_lines_yoffset
 
             # if the line is off screen
             # if they if they move down set the line over the highest one
