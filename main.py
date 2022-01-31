@@ -35,7 +35,7 @@ class Game:
         # self explaining variables for the background lines and rects
         self.background_lines_width = 10
         self.background_lines_distance = 20
-        self.background_lines_yoffset = -30
+        self.background_lines_yoffset = 0
         self.background_lines_speed = -1
         self.background_rects_max_size = 64
         self.background_rects_min_size = 32
