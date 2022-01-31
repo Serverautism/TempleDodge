@@ -46,10 +46,6 @@ class Game:
         self.map_shadow_speed = 1
         self.map_shadow_change_speed = 0.2
 
-        self.last_time = time.time()
-        # dt = delta time --> represented time between two frames
-        self.dt = 1
-
         # count raises with every frame until to keep track when so switch to the next frame
         # count and frames are randomized to make the shadows feel more 'smooth'
         # variable names represent map_shadow + the side they are at + their rgb value + frame / count
@@ -85,11 +81,10 @@ class Game:
                 self.game_save = json.load(f)
                 self.highscore = self.game_save['highscore']
         else:
-            default_gamesave = {"highscore": 0}
-            self.game_save = default_gamesave
+            self.game_save = {"highscore": 0}
             self.highscore = 0
             with open('Data/Files/gamesave.json', 'w') as f:
-                json.dump(default_gamesave, f, indent=4)
+                json.dump(self.game_save, f, indent=4)
 
         # screen_flags are just some special modes for the window
         screen_flags = pygame.DOUBLEBUF, pygame.HWSURFACE
@@ -180,6 +175,10 @@ class Game:
         pygame.mixer.music.load('Data/Assets/Sound/BackgroundMusic/background_music_1.wav')
         pygame.mixer.music.set_volume(.1)
         pygame.mixer.music.play(-1)
+
+        self.last_time = time.time()
+        # dt = delta time --> represented time between two frames
+        self.dt = 0
 
     # the run function holds the main game loop
     def run(self):
