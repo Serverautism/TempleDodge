@@ -45,6 +45,7 @@ class BulletHandler:
                 # check if the phase is still going
                 self.phase_count += 1
                 if self.phase_count / 60 >= self.phase_duration:
+                    self.phase_count = 0
                     self.phase = False
 
                 if self.time_since_last_bullet >= self.phase_bullet_time:
