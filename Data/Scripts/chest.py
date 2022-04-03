@@ -61,8 +61,8 @@ class Chest:
         self.particles = []
 
         # how many particles should be spawned
-        self.open_particle_amuont = 60
-        self.death_particle_amuont = 60
+        self.open_particle_amount = 60
+        self.death_particle_amount = 60
 
         # load the sounds and set their volume
         self.crush_sound = pygame.mixer.Sound('Data/Assets/Sound/Sfx/chest_crush_1.wav')
@@ -130,11 +130,11 @@ class Chest:
 
     # adds the circle particle animation
     def add_death_particles(self, speed):
-        for i in range(self.death_particle_amuont):
+        for i in range(self.death_particle_amount):
             center = list(funcs.render_pos_to_screen_pos(self.rect.center, (1920, 1080)))
 
             # split 360 degrees by the number of particles
-            radians = math.radians((360 / self.death_particle_amuont) * i)
+            radians = math.radians((360 / self.death_particle_amount) * i)
 
             # set the velocity vector based on the angle the particle in flying at and add a little randomisation
             velocity = [speed * math.cos(radians) + (randint(1, 10) / 10 - .5), speed * math.sin(radians) + (randint(1, 10) / 10 - .5)]
@@ -148,7 +148,7 @@ class Chest:
 
     # creates the particle fountain animation
     def add_open_particles(self):
-        for i in range(self.open_particle_amuont):
+        for i in range(self.open_particle_amount):
             # the particles just fly up and a random amount to the left or right
             center = list(funcs.render_pos_to_screen_pos(self.rect.center, (1920, 1080)))
             velocity = [randint(1, 40) / 10 - 2, -8 + (randint(1, 20) / 10 - 1)]
