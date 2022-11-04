@@ -187,7 +187,7 @@ class Game:
         while self.running:
             # clock keeps the game from overshoot the fps
             self.clock.tick(self.fps)
-            print(self.clock.get_fps())
+            # print(self.clock.get_fps())
 
             # determine delta time which is mostly used with movement to compensate slower fps
             self.dt = time.time() - self.last_time
